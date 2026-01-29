@@ -13,4 +13,10 @@
         <item name="postSplashScreenTheme">@style/Base.Theme.UnitConverterLite</item>
     </style>
 
+    <style name="ToolbarTitle" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:fontFamily">@font/nunito_medium</item> <!-- Your Figma font -->
+        <item name="android:textSize">24sp</item> <!-- Set your preferred size -->
+        <item name="android:textColor">@color/text_grey</item>
+    </style>
+
 </resources>

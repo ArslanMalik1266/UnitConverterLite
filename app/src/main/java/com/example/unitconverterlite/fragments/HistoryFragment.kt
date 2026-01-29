@@ -9,11 +9,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.unitconverterlite.Adaptor.HistoryAdapter
 import com.example.unitconverterlite.DataClass.HistoryItem
+import com.example.unitconverterlite.MainActivity
 import com.example.unitconverterlite.R
+import com.google.android.material.appbar.MaterialToolbar
 
 
 class HistoryFragment : Fragment() {
 
+    override fun onResume() {
+        super.onResume()
+        (activity as? MainActivity)?.showBottomNav(true)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +38,14 @@ class HistoryFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val toolbar = view.findViewById<MaterialToolbar>(R.id.topAppBar)
+        toolbar.setNavigationOnClickListener {
+            requireActivity().onBackPressed()
+        }
     }
 
 

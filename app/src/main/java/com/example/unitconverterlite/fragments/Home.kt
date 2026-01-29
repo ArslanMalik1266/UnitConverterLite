@@ -11,7 +11,9 @@ import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.cardview.widget.CardView
 import com.example.unitconverterlite.DataClass.CardItem
+import com.example.unitconverterlite.MainActivity
 import com.example.unitconverterlite.R
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
 class Home : Fragment() {
@@ -21,6 +23,11 @@ class Home : Fragment() {
         super.onCreate(savedInstanceState)
 
     }
+    override fun onResume() {
+        super.onResume()
+        (activity as? MainActivity)?.showBottomNav(true)
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,39 +37,39 @@ class Home : Fragment() {
 
         val everydayGrid = view.findViewById<GridLayout>(R.id.grid_everyday)
         val everydayCards = listOf(
-            CardItem("Length", R.drawable.length_icon_new, SettingsFragment()),
-            CardItem("Area", R.drawable.area_icon, SettingsFragment()),
-            CardItem("Time", R.drawable.time_icon, SettingsFragment()),
-            CardItem("Volume", R.drawable.volume_icon, SettingsFragment()),
-            CardItem("Temperature", R.drawable.temp_icon, SettingsFragment()),
-            CardItem("Weight", R.drawable.weight_icon, SettingsFragment()),
-            CardItem("Speed", R.drawable.speed_icon, SettingsFragment()),
-            CardItem("Energy", R.drawable.energy_icon, SettingsFragment())
+            CardItem("Length", R.drawable.length_icon_new, UnitConverterFragment()),
+            CardItem("Area", R.drawable.area_icon, UnitConverterFragment()),
+            CardItem("Time", R.drawable.time_icon, UnitConverterFragment()),
+            CardItem("Volume", R.drawable.volume_icon, UnitConverterFragment()),
+            CardItem("Temperature", R.drawable.temp_icon, UnitConverterFragment()),
+            CardItem("Weight", R.drawable.weight_icon, UnitConverterFragment()),
+            CardItem("Speed", R.drawable.speed_icon, UnitConverterFragment()),
+            CardItem("Energy", R.drawable.energy_icon, UnitConverterFragment())
         )
         addCardsToGrid(everydayGrid, everydayCards)
 
         val mechGrid = view.findViewById<GridLayout>(R.id.grid_mechanical)
         val mechCards = listOf(
-            CardItem("Power", R.drawable.power_icon, SettingsFragment()),
-            CardItem("Torque", R.drawable.torque_icon, SettingsFragment()),
-            CardItem("Pressure", R.drawable.torque_icon, SettingsFragment()),
-            CardItem("Force", R.drawable.energy_icon, SettingsFragment()),
-            CardItem("Angle", R.drawable.angle_icon, SettingsFragment())
+            CardItem("Power", R.drawable.power_icon, UnitConverterFragment()),
+            CardItem("Torque", R.drawable.torque_icon, UnitConverterFragment()),
+            CardItem("Pressure", R.drawable.pressure_icon, UnitConverterFragment()),
+            CardItem("Force", R.drawable.energy_icon, UnitConverterFragment()),
+            CardItem("Angle", R.drawable.angle_icon, UnitConverterFragment())
         )
         addCardsToGrid(mechGrid, mechCards)
 
         val financeGrid = view.findViewById<GridLayout>(R.id.grid_finance)
         val financeCards = listOf(
-            CardItem("Ratio", R.drawable.ratio_icon, SettingsFragment()),
-            CardItem("Currency", R.drawable.currency_icon, SettingsFragment()),
-            CardItem("Percentage", R.drawable.percentage_icon, SettingsFragment())
+            CardItem("Ratio", R.drawable.ratio_icon, UnitConverterFragment()),
+            CardItem("Currency", R.drawable.currency_icon, UnitConverterFragment()),
+            CardItem("Percentage", R.drawable.percentage_icon, UnitConverterFragment())
         )
         addCardsToGrid(financeGrid, financeCards)
 
         val specialGrid = view.findViewById<GridLayout>(R.id.grid_special)
         val specialCards = listOf(
-            CardItem("Sound", R.drawable.sound_icon, SettingsFragment()),
-            CardItem("BMI", R.drawable.bmi_icon, SettingsFragment())
+            CardItem("Sound", R.drawable.sound_icon, UnitConverterFragment()),
+            CardItem("BMI", R.drawable.bmi_icon, UnitConverterFragment())
         )
         addCardsToGrid(specialGrid, specialCards)
 
@@ -96,10 +103,18 @@ class Home : Fragment() {
             }
             card.layoutParams = params
 
+
             card.setOnClickListener {
+                val fragment = item.fragment
+                val bundle = Bundle().apply {
+                    putString("title", item.title)
+                    putString("type", item.title)
+                }
+                fragment.arguments = bundle
+
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.main_container, item.fragment)
-                    .addToBackStack(null)
+                    .addToBackStack("UnitConverter")
                     .commit()
             }
 

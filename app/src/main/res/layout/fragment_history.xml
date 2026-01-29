@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
+    android:padding="8dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragments.HistoryFragment">
 
@@ -18,7 +19,7 @@
       android:layout_height="?attr/actionBarSize"
       android:background="@color/white"
       app:title="History"
-      app:titleTextColor="@color/dark_grey"
+      app:titleTextAppearance="@style/ToolbarTitle"
       app:navigationIcon="@drawable/back_arrow"/>
  </com.google.android.material.appbar.AppBarLayout>
 
