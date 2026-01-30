@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:padding="8dp"
+    android:paddingTop="8dp"
     tools:context=".fragments.Home">
 
     <EditText
@@ -27,109 +27,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <ScrollView
-        android:id="@+id/scrollView_home"
-        android:layout_width="0dp"
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/homeRecycler"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:clipToPadding="false"
         app:layout_constraintTop_toBottomOf="@id/searchView_home"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:scrollbars="none"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp">
-
-            <TextView
-                android:id="@+id/title_everyday"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Everyday Measurements"
-                android:textSize="14sp"
-                android:fontFamily="@font/nunito_semi_bold"
-                android:textStyle="bold"
-                android:textColor="@color/dark_grey"
-                android:padding="8dp"/>
-
-            <GridLayout
-                android:id="@+id/grid_everyday"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:columnCount="3"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
-
-
-            </GridLayout>
-
-            <TextView
-                android:id="@+id/title_mechanical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Mechanical Units"
-                android:textColor="@color/dark_grey"
-                android:textSize="14sp"
-                android:fontFamily="@font/nunito_semi_bold"
-                android:textStyle="bold"
-                android:padding="8dp"/>
-
-            <GridLayout
-                android:id="@+id/grid_mechanical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:columnCount="3"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
-
-
-            </GridLayout>
-
-            <TextView
-                android:id="@+id/title_finance"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Finance"
-                android:textColor="@color/dark_grey"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:fontFamily="@font/nunito_semi_bold"
-                android:padding="8dp"/>
-
-            <GridLayout
-                android:id="@+id/grid_finance"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:columnCount="3"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
-
-
-            </GridLayout>
-
-            <TextView
-                android:id="@+id/title_special"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Specialized"
-                android:textSize="14sp"
-                android:textColor="@color/dark_grey"
-                android:textStyle="bold"
-                android:fontFamily="@font/nunito_semi_bold"
-                android:padding="8dp"/>
-
-            <GridLayout
-                android:id="@+id/grid_special"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:columnCount="3"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
-
-            </GridLayout>
-
-        </LinearLayout>
-    </ScrollView>
+        app:layout_constraintEnd_toEndOf="parent"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

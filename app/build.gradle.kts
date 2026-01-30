@@ -46,5 +46,6 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation("androidx.core:core-splashscreen:1.2.0")
+    implementation ("androidx.viewpager2:viewpager2:1.1.0")
 
 }
