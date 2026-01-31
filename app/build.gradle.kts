@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id ("kotlin-kapt")
 }
 
 android {
@@ -47,5 +48,10 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation("androidx.core:core-splashscreen:1.2.0")
     implementation ("androidx.viewpager2:viewpager2:1.1.0")
+    implementation ("androidx.room:room-runtime:2.8.4")
+    kapt ("androidx.room:room-compiler:2.8.4")
+    implementation ("androidx.room:room-ktx:2.8.4")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0")
+    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.10.0")
 
 }

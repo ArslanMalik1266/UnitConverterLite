@@ -38,7 +38,7 @@
             android:fontFamily="@font/nunito_regular"
             android:gravity="center_horizontal"
             android:inputType="numberDecimal"
-            android:text="129"
+            android:text="0"
             android:textColor="@color/dark_grey"
             android:textSize="18sp"
             app:layout_constraintEnd_toStartOf="@id/value_one_spinner"
@@ -55,7 +55,7 @@
             app:layout_constraintTop_toTopOf="@id/value_one" />
 
         <ImageView
-            android:id="@+id/swtiching_unit_icon"
+            android:id="@+id/switching_unit_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -73,12 +73,12 @@
             android:fontFamily="@font/nunito_regular"
             android:gravity="center_horizontal"
             android:inputType="numberDecimal"
-            android:text="329"
+            android:text="0"
             android:textColor="@color/blue_color"
             android:textSize="18sp"
             app:layout_constraintEnd_toStartOf="@id/value_two_spinner"
             app:layout_constraintStart_toStartOf="@id/value_one"
-            app:layout_constraintTop_toBottomOf="@id/swtiching_unit_icon" />
+            app:layout_constraintTop_toBottomOf="@id/switching_unit_icon" />
 
         <Spinner
             android:id="@+id/value_two_spinner"
@@ -449,15 +449,25 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-    <GridLayout
-        android:id="@+id/keyoboard_grid_layout"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="350dp"
-        android:layout_gravity="bottom"
-        android:background="@color/mosly_white"
-        android:padding="16dp">
+        android:layout_height="match_parent"
 
-    </GridLayout>
+        >
+
+        <GridLayout
+            android:id="@+id/keyoboard_grid_layout"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:paddingBottom="8dp"
+            android:background="@color/mosly_white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHeight_percent="0.45"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,23 +1,26 @@
 package com.example.unitconverterlite.fragments
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.EditText
-import android.widget.GridLayout
-import android.widget.Spinner
+import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.example.unitconverterlite.Adaptor.PercentagePagerAdapter
+import com.example.unitconverterlite.DataClass.HistoryItem
 import com.example.unitconverterlite.MainActivity
 import com.example.unitconverterlite.R
+import com.example.unitconverterlite.utils.UnitConverter
+import com.example.unitconverterlite.viewModel.HistoryViewModel
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.tabs.TabLayout
@@ -28,6 +31,15 @@ class UnitConverterFragment : Fragment() {
     private lateinit var valueOne: EditText
     private lateinit var valueTwo: EditText
     internal var activeEditText: EditText? = null
+    private lateinit var equalButton: MaterialButton
+    private lateinit var keyboard: GridLayout
+    private lateinit var switchButton: ImageView
+    private lateinit var value_one_spinner: Spinner
+    private lateinit var value_two_spinner: Spinner
+    private var copyButtons: List<Button> = emptyList()
+    private lateinit var copyButton: MaterialButton
+    private var isUpdating = false
+    private lateinit var historyViewModel: HistoryViewModel
 
     private val unitsMap = mapOf(
         "Length" to listOf("Meters", "Kilometers", "Miles", "Feet", "Inches"),
@@ -43,7 +55,7 @@ class UnitConverterFragment : Fragment() {
         "Pressure" to listOf("Pa", "kPa", "Bar", "psi"),
         "Force" to listOf("Newton", "Kilogram-force", "Pound-force"),
         "Angle" to listOf("Degree", "Radian", "Gradian"),
-            "Currency" to listOf("USD", "EUR", "GBP", "JPY", "PKR"),
+        "Currency" to listOf("USD", "EUR", "GBP", "JPY", "PKR"),
         "Sound" to listOf("Decibel"),
         "BMI" to listOf("Metric", "Imperial")
     )
@@ -65,20 +77,32 @@ class UnitConverterFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Toolbar setup
         val toolbar = view.findViewById<MaterialToolbar>(R.id.unitConverter_appBar)
         val cardTitle = arguments?.getString("title") ?: "Unit Converter"
         val cardType = arguments?.getString("type") ?: "Length"
         toolbar.title = cardTitle
+        historyViewModel = ViewModelProvider(
+            this,
+            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+        )[HistoryViewModel::class.java]
+        toolbar.setNavigationOnClickListener { parentFragmentManager.popBackStack() }
 
+        // UI containers
         val constraintOne = view.findViewById<ConstraintLayout>(R.id.constraint_one)
         val layoutPercentage = view.findViewById<ConstraintLayout>(R.id.percentage_UI)
         val ratioUI = view.findViewById<ConstraintLayout>(R.id.ratio_UI)
         val bmiUI = view.findViewById<ConstraintLayout>(R.id.bmi_UI)
+        switchButton = view.findViewById<ImageView>(R.id.switching_unit_icon)
+        value_one_spinner = view.findViewById<Spinner>(R.id.value_one_spinner)
+        value_two_spinner = view.findViewById<Spinner>(R.id.value_two_spinner)
 
+        // Hide all
+        listOf(constraintOne, layoutPercentage, ratioUI, bmiUI).forEach {
+            it.visibility = View.GONE
+        }
 
-        constraintOne.visibility = View.GONE
-        layoutPercentage.visibility = View.GONE
-
+        // Show relevant layout
         when (cardType) {
             "Percentage" -> {
                 layoutPercentage.visibility = View.VISIBLE
@@ -89,6 +113,7 @@ class UnitConverterFragment : Fragment() {
                 ratioUI.visibility = View.VISIBLE
                 setupRatioUI(view)
             }
+
             "BMI" -> {
                 bmiUI.visibility = View.VISIBLE
                 setupBMIUI(view)
@@ -100,18 +125,23 @@ class UnitConverterFragment : Fragment() {
             }
         }
 
-        toolbar.setNavigationOnClickListener {
-            parentFragmentManager.popBackStack()
-        }
+        // Copy buttons
+        copyButtons = listOf(
+            view.findViewById(R.id.copy_result_btn),
+            view.findViewById(R.id.copy_result_ratio_btn),
+            view.findViewById(R.id.copy_result_bmi_btn)
+        )
+        copyButtons.forEach { setCopyButtonEnabled(it, false) }
 
+        // Insets
         ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom)
             insets
         }
-
-        setCopyButtonEnabled(false)
+        switchButton()
     }
+
 
     private fun setupRegularUI(view: View, cardType: String) {
         val spinnerOne = view.findViewById<Spinner>(R.id.value_one_spinner)
@@ -126,26 +156,55 @@ class UnitConverterFragment : Fragment() {
         valueOne = view.findViewById(R.id.value_one)
         valueTwo = view.findViewById(R.id.value_two)
 
+        setupEditText(valueOne)
+        setupEditText(valueTwo)
+
         valueOne.requestFocus()
         activeEditText = valueOne
-        showKeyboard(true)
 
-        valueOne.showSoftInputOnFocus = false
-        valueTwo.showSoftInputOnFocus = false
-
-        valueOne.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                activeEditText = valueOne
-                showKeyboard(true)
-                setCopyButtonEnabled(false)
+        valueOne.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun afterTextChanged(s: Editable?) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (!isUpdating) convertFromFirst()
+                updateEqualButtonState(hasValue(valueOne))
             }
+        })
+
+//            valueTwo.addTextChangedListener(object : TextWatcher {
+//                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+//                override fun afterTextChanged(s: Editable?) {}
+//                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+//                    if (!isUpdating) convertFromSecond()
+//                    updateEqualButtonState(hasValue(valueTwo))
+//                }
+//            })
+
+
+        spinnerOne.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                if (!isUpdating) convertFromFirst()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
-        valueTwo.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                activeEditText = valueTwo
-                showKeyboard(true)
-                setCopyButtonEnabled(false)
+
+        spinnerTwo.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                if (!isUpdating) convertFromFirst()
             }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
     }
 
@@ -154,11 +213,10 @@ class UnitConverterFragment : Fragment() {
         val tabLayout = view.findViewById<TabLayout>(R.id.percentage_tab_layout)
         val viewPager = view.findViewById<ViewPager2>(R.id.percentage_view_pager)
 
-        val adapter = PercentagePagerAdapter(this)
-        viewPager.adapter = adapter
+        viewPager.adapter = PercentagePagerAdapter(this)
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-            tab.text = when(position) {
+            tab.text = when (position) {
                 0 -> "% Of"
                 1 -> "Add"
                 2 -> "Subtract"
@@ -178,24 +236,140 @@ class UnitConverterFragment : Fragment() {
         }
     }
 
+    private fun setupRatioUI(view: View) {
+        val xValue = view.findViewById<EditText>(R.id.x_value)
+        val yValue = view.findViewById<EditText>(R.id.y_value)
+        val resultValue = view.findViewById<EditText>(R.id.result_value)
+        copyButton = view.findViewById(R.id.copy_result_ratio_btn)
+
+        setupEditText(xValue)
+        setupEditText(yValue)
+
+        resultValue.isFocusable = false
+        resultValue.isClickable = false
+
+        setCopyButtonEnabled(false)
+
+        xValue.requestFocus()
+        activeEditText = xValue
+
+        val watcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun afterTextChanged(s: Editable?) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val xText = xValue.text.toString().toDoubleOrNull()
+                val yText = yValue.text.toString().toDoubleOrNull()
+
+                val enableEqual = xText != null && xText > 0 && yText != null && yText > 0
+                updateEqualButtonState(enableEqual)
+                calculateRatio(xValue, yValue, resultValue)
+            }
+        }
+
+        xValue.addTextChangedListener(watcher)
+        yValue.addTextChangedListener(watcher)
+
+        copyButton.setOnClickListener {
+        }
+    }
+
+    private fun calculateRatio(xEt: EditText, yEt: EditText, resultEt: EditText) {
+        val x = xEt.text.toString().toDoubleOrNull()
+        val y = yEt.text.toString().toDoubleOrNull()
+
+        if (x != null && y != null && x > 0 && y > 0) {
+            fun gcd(a: Int, b: Int): Int {
+                return if (b == 0) a else gcd(b, a % b)
+            }
+
+            val xInt = (x * 1000).toInt()
+            val yInt = (y * 1000).toInt()
+            val divisor = gcd(xInt, yInt)
+
+            val reducedX = xInt / divisor
+            val reducedY = yInt / divisor
+
+            resultEt.setText("$reducedX:$reducedY")
+            setCopyButtonEnabled(true)
+        } else {
+            resultEt.setText("")
+            setCopyButtonEnabled(false)
+        }
+    }
+
+
+    private fun setCopyButtonEnabled(enabled: Boolean) {
+        copyButton.isEnabled = enabled
+        if (enabled) {
+            copyButton.setBackgroundTintList(
+                ContextCompat.getColorStateList(
+                    requireContext(),
+                    R.color.blue_color
+                )
+            )
+            copyButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        } else {
+            copyButton.setBackgroundTintList(
+                ContextCompat.getColorStateList(
+                    requireContext(),
+                    R.color.light_grey
+                )
+            )
+            copyButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_grey))
+        }
+    }
+
+    private fun setupBMIUI(view: View) {
+        val feetEt = view.findViewById<EditText>(R.id.feet_value)
+        val inchesEt = view.findViewById<EditText>(R.id.inches_value)
+        val weightEt = view.findViewById<EditText>(R.id.weight_value)
+
+        listOf(feetEt, inchesEt, weightEt).forEach { setupEditText(it) }
+
+        feetEt.requestFocus()
+        activeEditText = feetEt
+    }
+
+    private fun setupEditText(edit: EditText) {
+        edit.showSoftInputOnFocus = false
+
+        edit.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun afterTextChanged(s: Editable?) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                updateEqualButtonState(hasValue(edit))
+            }
+        })
+
+        edit.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                activeEditText = edit
+                showKeyboard(true)
+                updateEqualButtonState(hasValue(edit))
+            }
+        }
+    }
+
+    private fun hasValue(edit: EditText?): Boolean {
+        return edit?.text.toString().toDoubleOrNull()?.let { it > 0 } ?: false
+    }
+
+
     private fun setupKeyboard(view: View) {
-        val gridLayout: GridLayout = view.findViewById(R.id.keyoboard_grid_layout)
-        val buttons = listOf(
-            "7", "8", "9",
-            "4", "5", "6",
-            "1", "2", "3",
-            ".", "0", "⌫"
-        )
+        keyboard = view.findViewById(R.id.keyoboard_grid_layout)
+        keyboard.removeAllViews()
 
-        gridLayout.rowCount = 4
-        gridLayout.columnCount = 3
+        val keys = listOf("7", "8", "9", "4", "5", "6", "1", "2", "3", ".", "0", "⌫")
+        keyboard.rowCount = 5
+        keyboard.columnCount = 3
 
-        buttons.forEachIndexed { index, label ->
+        keys.forEachIndexed { index, label ->
             val button = MaterialButton(requireContext()).apply {
                 text = label
-                textSize = 36f
-                setTextColor(resources.getColor(R.color.text_grey))
+                textSize = 28f
                 setBackgroundResource(R.drawable.keyboard_key_ripple)
+                setTextColor(resources.getColor(R.color.text_grey))
                 backgroundTintList = null
                 typeface = ResourcesCompat.getFont(requireContext(), R.font.inter_regular)
             }
@@ -203,161 +377,143 @@ class UnitConverterFragment : Fragment() {
             val param = GridLayout.LayoutParams(
                 GridLayout.spec(index / 3, 1f),
                 GridLayout.spec(index % 3, 1f)
-            ).apply {
-                width = 0
-                height = 0
-                setMargins(4, 4, 4, 4)
-            }
-            button.layoutParams = param
+            ).apply { width = 0; height = 0; setMargins(4, 4, 4, 4) }
 
-            button.setOnClickListener {
-                activeEditText?.let { edit ->
-                    when (label) {
-                        "⌫" -> { // Backspace
-                            val start = edit.selectionStart
-                            val end = edit.selectionEnd
-                            if (start > 0) {
-                                edit.text.replace(start - 1, end, "")
-                                edit.setSelection(start - 1)
-                            }
-                        }
-                        else -> {
-                            val start = edit.selectionStart
-                            edit.text.insert(start, label)
-                            edit.setSelection(start + label.length)
-                        }
+            button.layoutParams = param
+            button.setOnClickListener { handleKeyboardInput(label) }
+            keyboard.addView(button)
+        }
+
+        equalButton = MaterialButton(requireContext()).apply {
+            text = "="
+            textSize = 28f
+            setTextColor(resources.getColor(R.color.text_grey))
+            setBackgroundResource(R.drawable.equal_button_stroke)
+            backgroundTintList = null
+            typeface = ResourcesCompat.getFont(requireContext(), R.font.inter_regular)
+            setOnClickListener {
+                handleEqualClick()
+                val given = valueOne.text.toString()
+                val received = valueTwo.text.toString()
+                val givenUnit = value_one_spinner.selectedItem.toString()
+                val receivedUnit = value_two_spinner.selectedItem.toString()
+                val unitName = arguments?.getString("type") ?: "Length"
+                if (given.isNotEmpty() && received.isNotEmpty()) {
+                    val historyItem = HistoryItem(
+                        valueGiven = given,
+                        valueGivenUnit = givenUnit,
+                        valueReceived = received,
+                        valueReceivedUnit = receivedUnit,
+                        unitName = unitName
+                    )
+                    historyViewModel.addHistory(historyItem)
+                }
+            }
+        }
+
+        val equalParams = GridLayout.LayoutParams(
+            GridLayout.spec(4, 1f),
+            GridLayout.spec(0, 3, 1f)
+        ).apply { width = 0; height = 0 }
+
+        equalButton.layoutParams = equalParams
+        keyboard.addView(equalButton)
+
+        // Initially hide
+        keyboard.post { keyboard.translationY = keyboard.height.toFloat() }
+    }
+
+    private fun handleKeyboardInput(label: String) {
+        activeEditText?.let { edit ->
+            when (label) {
+                "⌫" -> {
+                    val start = edit.selectionStart
+                    val end = edit.selectionEnd
+                    if (start > 0) {
+                        edit.text.replace(start - 1, end, "")
+                        edit.setSelection(start - 1)
+                    }
+                }
+
+                else -> {
+                    if (edit.text.toString() == "0") {
+                        edit.setText(label)
+                        edit.setSelection(1)
+                    } else {
+                        val start = edit.selectionStart
+                        edit.text.insert(start, label)
+                        edit.setSelection(start + label.length)
                     }
                 }
             }
+        }
+        updateEqualButtonState(hasValue(activeEditText))
+    }
 
-            gridLayout.addView(button)
+    private fun handleEqualClick() {
+        showKeyboard(false)
+        copyButtons.forEach { setCopyButtonEnabled(it, hasValue(activeEditText)) }
+        updateEqualButtonState(false)
+    }
+
+    internal fun updateEqualButtonState(enabled: Boolean) {
+        equalButton.isEnabled = enabled
+        if (enabled) {
+            equalButton.setBackgroundResource(R.drawable.equal_button_filled)
+            equalButton.setTextColor(resources.getColor(R.color.white))
+        } else {
+            equalButton.setBackgroundResource(R.drawable.equal_button_stroke)
+            equalButton.setTextColor(resources.getColor(R.color.text_grey))
         }
     }
 
-    private fun setCopyButtonEnabled(enabled: Boolean) {
-        val copyButton = view?.findViewById<Button>(R.id.copy_result_btn)
-        copyButton?.isEnabled = enabled
+    private fun setCopyButtonEnabled(button: Button?, enabled: Boolean) {
+        button?.isEnabled = enabled
         if (enabled) {
-            copyButton?.setBackgroundColor(resources.getColor(R.color.blue_color))
-            copyButton?.setTextColor(resources.getColor(R.color.white))
+            button?.setBackgroundColor(resources.getColor(R.color.blue_color))
+            button?.setTextColor(resources.getColor(R.color.white))
         } else {
-//            copyButton?.setBackgroundColor(resources.getColor(R.color.light_grey))
-//            copyButton?.setTextColor(resources.getColor(R.color.text_grey))
-            copyButton?.setBackgroundColor(resources.getColor(R.color.blue_color))
-            copyButton?.setTextColor(resources.getColor(R.color.white))
+            button?.setBackgroundColor(resources.getColor(R.color.light_grey))
+            button?.setTextColor(resources.getColor(R.color.text_grey))
         }
     }
 
     internal fun showKeyboard(show: Boolean) {
-        val keyboard = view?.findViewById<GridLayout>(R.id.keyoboard_grid_layout) ?: return
-        if (show) {
-            keyboard.animate().translationY(0f).setDuration(300).start()
-        } else {
-            keyboard.animate().translationY(keyboard.height.toFloat()).setDuration(300).start()
+        if (!::keyboard.isInitialized) return
+
+        keyboard.post {
+            val translationY = if (show) 0f else keyboard.height.toFloat()
+            keyboard.animate().translationY(translationY).setDuration(300).start()
         }
+
+        if (!show) activeEditText?.clearFocus()
     }
 
-    private fun setupRatioUI(view: View) {
+    private fun switchButton() {
+        switchButton.setOnClickListener {
+            val tempValue = valueOne.text.toString()
+            valueOne.setText(valueTwo.text.toString())
+            valueTwo.setText(tempValue)
 
-        val xValue = view.findViewById<EditText>(R.id.x_value)
-        val yValue = view.findViewById<EditText>(R.id.y_value)
-        val resultValue = view.findViewById<EditText>(R.id.result_value)
+            val tempPosition = value_one_spinner.selectedItemPosition
+            value_one_spinner.setSelection(value_two_spinner.selectedItemPosition)
+            value_two_spinner.setSelection(tempPosition)
 
-        // Disable system keyboard
-        xValue.showSoftInputOnFocus = false
-        yValue.showSoftInputOnFocus = false
-        resultValue.showSoftInputOnFocus = false
 
-        // Initial focus
-        xValue.requestFocus()
-        activeEditText = xValue
-        showKeyboard(true)
-
-        xValue.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                activeEditText = xValue
-                showKeyboard(true)
-            }
         }
 
-        yValue.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                activeEditText = yValue
-                showKeyboard(true)
-            }
-        }
-
-        resultValue.isFocusable = false
-        resultValue.isClickable = false
     }
 
-    private fun setupBMIUI(view: View) {
+    private fun convertFromFirst() {
+        val input = valueOne.text.toString().toDoubleOrNull() ?: 0.0
+        val fromUnit = value_one_spinner.selectedItem.toString()
+        val toUnit = value_two_spinner.selectedItem.toString()
+        val type = arguments?.getString("type") ?: "Length"
 
-        val feetEt = view.findViewById<EditText>(R.id.feet_value)
-        val inchesEt = view.findViewById<EditText>(R.id.inches_value)
-        val weightEt = view.findViewById<EditText>(R.id.weight_value)
-        val resultEt = view.findViewById<EditText>(R.id.result_bmi_value)
-
-        // Disable system keyboard (important for your custom keyboard)
-        feetEt.showSoftInputOnFocus = false
-        inchesEt.showSoftInputOnFocus = false
-        weightEt.showSoftInputOnFocus = false
-        resultEt.showSoftInputOnFocus = false
-
-        // Set active edit text on focus
-        feetEt.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                activeEditText = feetEt
-                showKeyboard(true)
-            }
-        }
-
-        inchesEt.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                activeEditText = inchesEt
-                showKeyboard(true)
-            }
-        }
-
-        weightEt.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                activeEditText = weightEt
-                showKeyboard(true)
-            }
-        }
-
-        fun calculateBMI() {
-            val feet = feetEt.text.toString().toDoubleOrNull() ?: 0.0
-            val inches = inchesEt.text.toString().toDoubleOrNull() ?: 0.0
-            val weightKg = weightEt.text.toString().toDoubleOrNull() ?: 0.0
-
-            if (feet == 0.0 && inches == 0.0 || weightKg == 0.0) {
-                resultEt.setText("")
-                return
-            }
-
-            // Convert height to meters
-//            val totalInches = (feet * 12) + inches
-//            val heightMeters = totalInches * 0.0254
-//
-//            if (heightMeters == 0.0) return
-//
-//            val bmi = weightKg / (heightMeters * heightMeters)
-
-//            val category = when {
-//                bmi < 18.5 -> "Underweight"
-//                bmi < 25 -> "Normal"
-//                bmi < 30 -> "Overweight"
-//                else -> "Obese"
-//            }
-
-//            resultEt.setText(String.format("%.2f (%s)", bmi, category))
-        }
-
-        feetEt.requestFocus()
-        activeEditText = feetEt
-        showKeyboard(true)
+        isUpdating = true
+        val result = UnitConverter.convert(input, fromUnit, toUnit, type)
+        valueTwo.setText(if (result % 1.0 == 0.0) result.toInt().toString() else result.toString())
+        isUpdating = false
     }
-
 
 }
