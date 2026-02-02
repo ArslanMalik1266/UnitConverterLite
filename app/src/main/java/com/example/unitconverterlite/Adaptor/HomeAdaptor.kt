@@ -13,9 +13,11 @@ import com.example.unitconverterlite.DataClass.HomeItem
 import com.example.unitconverterlite.R
 
 class HomeAdapter(
-    private val items: List<HomeItem>,
+    internal var items: List<HomeItem>,
     private val fragmentManager: FragmentManager
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    private var fullList: List<HomeItem> = items.toList()
 
     companion object {
         private const val TYPE_HEADER = 0
@@ -82,4 +84,37 @@ class HomeAdapter(
         val title: TextView = view.findViewById(R.id.title)
         val icon: ImageView = view.findViewById(R.id.icon)
     }
+
+    fun filter(query: String) {
+        if (query.isEmpty()) {
+            items = fullList
+        } else {
+            val filtered = mutableListOf<HomeItem>()
+            var currentHeader: HomeItem.Header? = null
+            var headerAdded = false
+
+            fullList.forEach { item ->
+                when (item) {
+                    is HomeItem.Header -> {
+                        currentHeader = item
+                        headerAdded = false
+                    }
+                    is HomeItem.Card -> {
+                        if (item.cardItem.title.contains(query, ignoreCase = true)) {
+                            if (currentHeader != null && !headerAdded) {
+                                filtered.add(currentHeader!!)
+                                headerAdded = true
+                            }
+                            filtered.add(item)
+                        }
+                    }
+                }
+            }
+
+            items = filtered
+        }
+
+        notifyDataSetChanged()
+    }
+
 }

@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.GridLayout
 import android.widget.ImageView
 import android.widget.TextView
@@ -36,6 +37,8 @@ class Home : Fragment() {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
         val recycler = view.findViewById<RecyclerView>(R.id.homeRecycler)
 
+
+
         val items = listOf(
 
             HomeItem.Header("Everyday Measurements"),
@@ -58,22 +61,41 @@ class Home : Fragment() {
             HomeItem.Header("Finance"),
             HomeItem.Card(CardItem("Ratio", R.drawable.ratio_icon, UnitConverterFragment())),
             HomeItem.Card(CardItem("Currency", R.drawable.currency_icon, UnitConverterFragment())),
-            HomeItem.Card(CardItem("Percentage", R.drawable.percentage_icon, UnitConverterFragment())),
+            HomeItem.Card(
+                CardItem(
+                    "Percentage",
+                    R.drawable.percentage_icon,
+                    UnitConverterFragment()
+                )
+            ),
 
             HomeItem.Header("Special"),
             HomeItem.Card(CardItem("Sound", R.drawable.sound_icon, UnitConverterFragment())),
             HomeItem.Card(CardItem("BMI", R.drawable.bmi_icon, UnitConverterFragment()))
         )
 
+        val adapter = HomeAdapter(items, parentFragmentManager)
         val layoutManager = GridLayoutManager(requireContext(), 3)
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return if (items[position] is HomeItem.Header) 3 else 1
-            }
+                val item = adapter.items[position]
+                return if (item is HomeItem.Header) 3 else 1            }
         }
 
         recycler.layoutManager = layoutManager
-        recycler.adapter = HomeAdapter(items, parentFragmentManager)
+
+
+        recycler.adapter = adapter
+
+        val searchView = view.findViewById<EditText>(R.id.searchView_home)
+        searchView.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                adapter.filter(s.toString())
+            }
+
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
 
         return view
     }

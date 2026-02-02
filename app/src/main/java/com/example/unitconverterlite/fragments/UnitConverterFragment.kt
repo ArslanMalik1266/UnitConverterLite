@@ -13,18 +13,27 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.example.unitconverterlite.Adaptor.PercentagePagerAdapter
 import com.example.unitconverterlite.DataClass.HistoryItem
 import com.example.unitconverterlite.MainActivity
 import com.example.unitconverterlite.R
+import com.example.unitconverterlite.utils.AppPreferences
+import com.example.unitconverterlite.utils.SimpleWatcher
 import com.example.unitconverterlite.utils.UnitConverter
+import com.example.unitconverterlite.viewModel.BMIViewModel
 import com.example.unitconverterlite.viewModel.HistoryViewModel
+import com.example.unitconverterlite.viewModel.RatioViewModel
+import com.example.unitconverterlite.viewModel.UnitConverterViewModel
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 class UnitConverterFragment : Fragment() {
 
@@ -40,6 +49,12 @@ class UnitConverterFragment : Fragment() {
     private lateinit var copyButton: MaterialButton
     private var isUpdating = false
     private lateinit var historyViewModel: HistoryViewModel
+    private val ratioViewModel: RatioViewModel by activityViewModels()
+    private val bmiViewModel: BMIViewModel by activityViewModels()
+    private val unitConverterViewModel: UnitConverterViewModel by activityViewModels()
+
+
+
 
     private val unitsMap = mapOf(
         "Length" to listOf("Meters", "Kilometers", "Miles", "Feet", "Inches"),
@@ -81,6 +96,7 @@ class UnitConverterFragment : Fragment() {
         val toolbar = view.findViewById<MaterialToolbar>(R.id.unitConverter_appBar)
         val cardTitle = arguments?.getString("title") ?: "Unit Converter"
         val cardType = arguments?.getString("type") ?: "Length"
+
         toolbar.title = cardTitle
         historyViewModel = ViewModelProvider(
             this,
@@ -96,6 +112,9 @@ class UnitConverterFragment : Fragment() {
         switchButton = view.findViewById<ImageView>(R.id.switching_unit_icon)
         value_one_spinner = view.findViewById<Spinner>(R.id.value_one_spinner)
         value_two_spinner = view.findViewById<Spinner>(R.id.value_two_spinner)
+        valueOne =view.findViewById<EditText>(R.id.value_one)
+        valueTwo =view.findViewById<EditText>(R.id.value_two)
+
 
         // Hide all
         listOf(constraintOne, layoutPercentage, ratioUI, bmiUI).forEach {
@@ -143,6 +162,7 @@ class UnitConverterFragment : Fragment() {
     }
 
 
+
     private fun setupRegularUI(view: View, cardType: String) {
         val spinnerOne = view.findViewById<Spinner>(R.id.value_one_spinner)
         val spinnerTwo = view.findViewById<Spinner>(R.id.value_two_spinner)
@@ -152,6 +172,13 @@ class UnitConverterFragment : Fragment() {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerOne.adapter = adapter
         spinnerTwo.adapter = adapter
+        spinnerOne.post {
+            spinnerOne.dropDownWidth = spinnerOne.width
+        }
+
+        spinnerTwo.post {
+            spinnerTwo.dropDownWidth = spinnerTwo.width
+        }
 
         valueOne = view.findViewById(R.id.value_one)
         valueTwo = view.findViewById(R.id.value_two)
@@ -162,51 +189,71 @@ class UnitConverterFragment : Fragment() {
         valueOne.requestFocus()
         activeEditText = valueOne
 
-        valueOne.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun afterTextChanged(s: Editable?) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (!isUpdating) convertFromFirst()
-                updateEqualButtonState(hasValue(valueOne))
-            }
-        })
-
-//            valueTwo.addTextChangedListener(object : TextWatcher {
-//                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-//                override fun afterTextChanged(s: Editable?) {}
-//                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-//                    if (!isUpdating) convertFromSecond()
-//                    updateEqualButtonState(hasValue(valueTwo))
-//                }
-//            })
-
-
-        spinnerOne.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                if (!isUpdating) convertFromFirst()
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        // Observe LiveData
+        unitConverterViewModel.valueOne.observe(viewLifecycleOwner) { value ->
+            if (valueOne.text.toString() != value) valueOne.setText(value)
         }
 
-        spinnerTwo.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                if (!isUpdating) convertFromFirst()
+        unitConverterViewModel.valueTwo.observe(viewLifecycleOwner) { value ->
+            if (valueTwo.text.toString() != value) valueTwo.setText(value)
+        }
+
+        unitConverterViewModel.equalEnabled.observe(viewLifecycleOwner) { enabled ->
+            updateEqualButtonState(enabled)
+        }
+
+        val appPrefs = AppPreferences(requireContext())
+        lifecycleScope.launch {
+            val decimalPrecision = appPrefs.decimalPrecisionFlow.first() // get current saved value
+
+            valueOne.addTextChangedListener(SimpleWatcher {
+                val fromUnit = spinnerOne.selectedItem.toString()
+                val toUnit = spinnerTwo.selectedItem.toString()
+                val type = arguments?.getString("type") ?: "Length"
+                unitConverterViewModel.onValueOneChanged(
+                    valueOne.text.toString(),
+                    fromUnit,
+                    toUnit,
+                    type,
+                    decimalPrecision
+                )
+            })
+
+            spinnerOne.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                    val fromUnit = spinnerOne.selectedItem.toString()
+                    val toUnit = spinnerTwo.selectedItem.toString()
+                    val type = arguments?.getString("type") ?: "Length"
+                    unitConverterViewModel.onValueOneChanged(
+                        valueOne.text.toString(),
+                        fromUnit,
+                        toUnit,
+                        type,
+                        decimalPrecision
+                    )
+                }
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
+            spinnerTwo.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                    val fromUnit = spinnerOne.selectedItem.toString()
+                    val toUnit = spinnerTwo.selectedItem.toString()
+                    val type = arguments?.getString("type") ?: "Length"
+                    unitConverterViewModel.onValueOneChanged(
+                        valueOne.text.toString(),
+                        fromUnit,
+                        toUnit,
+                        type,
+                        decimalPrecision
+                    )
+                }
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
         }
+
     }
+
 
     private fun setupPercentageUI(view: View) {
         val typeface = ResourcesCompat.getFont(requireContext(), R.font.nunito_semi_bold)
@@ -236,6 +283,8 @@ class UnitConverterFragment : Fragment() {
         }
     }
 
+
+
     private fun setupRatioUI(view: View) {
         val xValue = view.findViewById<EditText>(R.id.x_value)
         val yValue = view.findViewById<EditText>(R.id.y_value)
@@ -247,56 +296,40 @@ class UnitConverterFragment : Fragment() {
 
         resultValue.isFocusable = false
         resultValue.isClickable = false
-
         setCopyButtonEnabled(false)
 
         xValue.requestFocus()
         activeEditText = xValue
 
-        val watcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun afterTextChanged(s: Editable?) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val xText = xValue.text.toString().toDoubleOrNull()
-                val yText = yValue.text.toString().toDoubleOrNull()
-
-                val enableEqual = xText != null && xText > 0 && yText != null && yText > 0
-                updateEqualButtonState(enableEqual)
-                calculateRatio(xValue, yValue, resultValue)
-            }
+        // Observe ViewModel
+        ratioViewModel.result.observe(viewLifecycleOwner) { result ->
+            resultValue.setText(result)
+            setCopyButtonEnabled(result.isNotEmpty())
         }
 
-        xValue.addTextChangedListener(watcher)
-        yValue.addTextChangedListener(watcher)
+        ratioViewModel.equalEnabled.observe(viewLifecycleOwner) { enabled ->
+            updateEqualButtonState(enabled)
+        }
+
+        xValue.addTextChangedListener(SimpleWatcher {
+            ratioViewModel.onXChanged(xValue.text.toString())
+        })
+
+        yValue.addTextChangedListener(SimpleWatcher {
+            ratioViewModel.onYChanged(yValue.text.toString())
+        })
 
         copyButton.setOnClickListener {
-        }
-    }
-
-    private fun calculateRatio(xEt: EditText, yEt: EditText, resultEt: EditText) {
-        val x = xEt.text.toString().toDoubleOrNull()
-        val y = yEt.text.toString().toDoubleOrNull()
-
-        if (x != null && y != null && x > 0 && y > 0) {
-            fun gcd(a: Int, b: Int): Int {
-                return if (b == 0) a else gcd(b, a % b)
+            val text = resultValue.text.toString()
+            if (text.isNotEmpty()) {
+                val clipboard = requireContext().getSystemService(android.content.ClipboardManager::class.java)
+                val clip = android.content.ClipData.newPlainText("ratio", text)
+                clipboard.setPrimaryClip(clip)
+                Toast.makeText(requireContext(), "Copied: $text", Toast.LENGTH_SHORT).show()
             }
-
-            val xInt = (x * 1000).toInt()
-            val yInt = (y * 1000).toInt()
-            val divisor = gcd(xInt, yInt)
-
-            val reducedX = xInt / divisor
-            val reducedY = yInt / divisor
-
-            resultEt.setText("$reducedX:$reducedY")
-            setCopyButtonEnabled(true)
-        } else {
-            resultEt.setText("")
-            setCopyButtonEnabled(false)
         }
     }
+
 
 
     private fun setCopyButtonEnabled(enabled: Boolean) {
@@ -305,7 +338,7 @@ class UnitConverterFragment : Fragment() {
             copyButton.setBackgroundTintList(
                 ContextCompat.getColorStateList(
                     requireContext(),
-                    R.color.blue_color
+                    R.color.app_color
                 )
             )
             copyButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
@@ -313,23 +346,62 @@ class UnitConverterFragment : Fragment() {
             copyButton.setBackgroundTintList(
                 ContextCompat.getColorStateList(
                     requireContext(),
-                    R.color.light_grey
+                    R.color.stroke
                 )
             )
-            copyButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_grey))
+            copyButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.light_gray))
         }
     }
+
 
     private fun setupBMIUI(view: View) {
         val feetEt = view.findViewById<EditText>(R.id.feet_value)
         val inchesEt = view.findViewById<EditText>(R.id.inches_value)
         val weightEt = view.findViewById<EditText>(R.id.weight_value)
+        val resultEt = view.findViewById<EditText>(R.id.result_bmi_value)
+        copyButton = view.findViewById(R.id.copy_result_bmi_btn)
 
         listOf(feetEt, inchesEt, weightEt).forEach { setupEditText(it) }
 
+        resultEt.isFocusable = false
+        resultEt.isClickable = false
+        setCopyButtonEnabled(false)
+
         feetEt.requestFocus()
         activeEditText = feetEt
+
+        bmiViewModel.bmiResult.observe(viewLifecycleOwner) { bmi ->
+            resultEt.setText(bmi)
+            setCopyButtonEnabled(bmi.isNotEmpty())
+        }
+
+        bmiViewModel.equalEnabled.observe(viewLifecycleOwner) { enabled ->
+            updateEqualButtonState(enabled)
+        }
+
+        feetEt.addTextChangedListener(SimpleWatcher {
+            bmiViewModel.onFeetChanged(feetEt.text.toString())
+        })
+
+        inchesEt.addTextChangedListener(SimpleWatcher {
+            bmiViewModel.onInchesChanged(inchesEt.text.toString())
+        })
+
+        weightEt.addTextChangedListener(SimpleWatcher {
+            bmiViewModel.onWeightChanged(weightEt.text.toString())
+        })
+
+        copyButton.setOnClickListener {
+            val text = resultEt.text.toString()
+            if (text.isNotEmpty()) {
+                val clipboard = requireContext().getSystemService(android.content.ClipboardManager::class.java)
+                val clip = android.content.ClipData.newPlainText("BMI", text)
+                clipboard.setPrimaryClip(clip)
+                Toast.makeText(requireContext(), "Copied: $text", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
+
 
     private fun setupEditText(edit: EditText) {
         edit.showSoftInputOnFocus = false
@@ -369,7 +441,7 @@ class UnitConverterFragment : Fragment() {
                 text = label
                 textSize = 28f
                 setBackgroundResource(R.drawable.keyboard_key_ripple)
-                setTextColor(resources.getColor(R.color.text_grey))
+                setTextColor(resources.getColor(R.color.light_gray))
                 backgroundTintList = null
                 typeface = ResourcesCompat.getFont(requireContext(), R.font.inter_regular)
             }
@@ -387,26 +459,19 @@ class UnitConverterFragment : Fragment() {
         equalButton = MaterialButton(requireContext()).apply {
             text = "="
             textSize = 28f
-            setTextColor(resources.getColor(R.color.text_grey))
+            setTextColor(resources.getColor(R.color.light_gray))
             setBackgroundResource(R.drawable.equal_button_stroke)
             backgroundTintList = null
             typeface = ResourcesCompat.getFont(requireContext(), R.font.inter_regular)
             setOnClickListener {
                 handleEqualClick()
-                val given = valueOne.text.toString()
-                val received = valueTwo.text.toString()
-                val givenUnit = value_one_spinner.selectedItem.toString()
-                val receivedUnit = value_two_spinner.selectedItem.toString()
-                val unitName = arguments?.getString("type") ?: "Length"
-                if (given.isNotEmpty() && received.isNotEmpty()) {
-                    val historyItem = HistoryItem(
-                        valueGiven = given,
-                        valueGivenUnit = givenUnit,
-                        valueReceived = received,
-                        valueReceivedUnit = receivedUnit,
-                        unitName = unitName
-                    )
-                    historyViewModel.addHistory(historyItem)
+                lifecycleScope.launch {
+                    val autoSaveEnabled = AppPreferences(requireContext()).isAutoSaveEnabled.first()
+                    if (autoSaveEnabled) {
+                        performConversionAndSaveHistory()
+                    } else {
+                     // just calculate without saving
+                    }
                 }
             }
         }
@@ -419,7 +484,6 @@ class UnitConverterFragment : Fragment() {
         equalButton.layoutParams = equalParams
         keyboard.addView(equalButton)
 
-        // Initially hide
         keyboard.post { keyboard.translationY = keyboard.height.toFloat() }
     }
 
@@ -463,18 +527,18 @@ class UnitConverterFragment : Fragment() {
             equalButton.setTextColor(resources.getColor(R.color.white))
         } else {
             equalButton.setBackgroundResource(R.drawable.equal_button_stroke)
-            equalButton.setTextColor(resources.getColor(R.color.text_grey))
+            equalButton.setTextColor(resources.getColor(R.color.light_gray))
         }
     }
 
     private fun setCopyButtonEnabled(button: Button?, enabled: Boolean) {
         button?.isEnabled = enabled
         if (enabled) {
-            button?.setBackgroundColor(resources.getColor(R.color.blue_color))
+            button?.setBackgroundColor(resources.getColor(R.color.app_color))
             button?.setTextColor(resources.getColor(R.color.white))
         } else {
-            button?.setBackgroundColor(resources.getColor(R.color.light_grey))
-            button?.setTextColor(resources.getColor(R.color.text_grey))
+            button?.setBackgroundColor(resources.getColor(R.color.stroke))
+            button?.setTextColor(resources.getColor(R.color.light_gray))
         }
     }
 
@@ -491,29 +555,100 @@ class UnitConverterFragment : Fragment() {
 
     private fun switchButton() {
         switchButton.setOnClickListener {
+            if (isUpdating) return@setOnClickListener
+
+            isUpdating = true
+
             val tempValue = valueOne.text.toString()
+            val tempSpinnerPosition = value_one_spinner.selectedItemPosition
+
             valueOne.setText(valueTwo.text.toString())
             valueTwo.setText(tempValue)
 
-            val tempPosition = value_one_spinner.selectedItemPosition
             value_one_spinner.setSelection(value_two_spinner.selectedItemPosition)
-            value_two_spinner.setSelection(tempPosition)
+            value_two_spinner.setSelection(tempSpinnerPosition)
+
+            isUpdating = false
+        }
+    }
 
 
+    private fun addHistory(
+        valueGiven: String,
+        valueGivenUnit: String,
+        valueReceived: String,
+        valueReceivedUnit: String,
+        unitName: String
+    ) {
+        if (valueGiven.isNotEmpty() && valueReceived.isNotEmpty()) {
+            val historyItem = HistoryItem(
+                valueGiven = valueGiven,
+                valueGivenUnit = valueGivenUnit,
+                valueReceived = valueReceived,
+                valueReceivedUnit = valueReceivedUnit,
+                unitName = unitName
+            )
+            historyViewModel.addHistory(historyItem)
         }
 
-    }
 
-    private fun convertFromFirst() {
-        val input = valueOne.text.toString().toDoubleOrNull() ?: 0.0
-        val fromUnit = value_one_spinner.selectedItem.toString()
-        val toUnit = value_two_spinner.selectedItem.toString()
+    }
+    private fun performConversionAndSaveHistory() {
         val type = arguments?.getString("type") ?: "Length"
 
-        isUpdating = true
-        val result = UnitConverter.convert(input, fromUnit, toUnit, type)
-        valueTwo.setText(if (result % 1.0 == 0.0) result.toInt().toString() else result.toString())
-        isUpdating = false
+        when (type) {
+            "BMI" -> {
+                val feet = view?.findViewById<EditText>(R.id.feet_value)?.text.toString()
+                val inches = view?.findViewById<EditText>(R.id.inches_value)?.text.toString()
+                val weight = view?.findViewById<EditText>(R.id.weight_value)?.text.toString()
+                val result = view?.findViewById<EditText>(R.id.result_bmi_value)?.text.toString()
+
+                if (feet.isNotEmpty() && inches.isNotEmpty() && weight.isNotEmpty() && result.isNotEmpty()) {
+                    addHistory(
+                        valueGiven = "$feet ft, $inches inch,",
+                        valueGivenUnit = weight,
+                        valueReceived = result,
+                        valueReceivedUnit = "BMI",
+                        unitName = "BMI"
+                    )
+                }
+            }
+
+            "Ratio" -> {
+                val x = view?.findViewById<EditText>(R.id.x_value)?.text.toString()
+                val y = view?.findViewById<EditText>(R.id.y_value)?.text.toString()
+                val result = view?.findViewById<EditText>(R.id.result_value)?.text.toString()
+
+                if (x.isNotEmpty() && y.isNotEmpty() && result.isNotEmpty()) {
+                    addHistory(
+                        valueGiven = x,
+                        valueGivenUnit = y,
+                        valueReceived = result,
+                        valueReceivedUnit = "Ratio",
+                        unitName = "Ratio"
+                    )
+                }
+            }
+
+            else -> {
+                val valueGiven = valueOne.text.toString()
+                val valueReceived = valueTwo.text.toString()
+                val fromUnit = value_one_spinner.selectedItem?.toString() ?: ""
+                val toUnit = value_two_spinner.selectedItem?.toString() ?: ""
+
+                if (valueGiven.isNotEmpty() && valueReceived.isNotEmpty()) {
+                    addHistory(
+                        valueGiven = valueGiven,
+                        valueGivenUnit = fromUnit,
+                        valueReceived = valueReceived,
+                        valueReceivedUnit = toUnit,
+                        unitName = type
+                    )
+                }
+            }
+        }
     }
+
+
 
 }

@@ -7,20 +7,24 @@ import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.unitconverterlite.fragments.HistoryFragment
 import com.example.unitconverterlite.fragments.Home
 import com.example.unitconverterlite.fragments.SettingsFragment
+import com.example.unitconverterlite.utils.ThemePreferences
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
     private lateinit var bottomNavigationView : BottomNavigationView
-
 
 
     @RequiresApi(Build.VERSION_CODES.R)
@@ -34,6 +38,7 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right,0)
             insets
         }
+
         window.decorView.apply {
             window.insetsController?.let { controller ->
                 controller.hide(android.view.WindowInsets.Type.navigationBars())
@@ -44,9 +49,11 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.main_container, Home())
-            .commit()
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.main_container, Home(), "home")
+                .commit()
+        }
 
         bottomNav()
 

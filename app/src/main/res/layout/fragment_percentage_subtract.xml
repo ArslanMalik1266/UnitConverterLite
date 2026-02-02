@@ -24,7 +24,7 @@
         android:drawableTint="@color/black"
         android:layout_marginTop="16dp"
         android:paddingStart="18dp"
-        android:background="@color/light_grey"
+        android:background="@color/stroke"
         android:padding="8dp"
         android:gravity="center"/>
 
@@ -35,7 +35,7 @@
         android:layout_marginTop="20dp"
         android:fontFamily="@font/nunito_semi_bold"
         android:src="@drawable/minus_icon"
-        android:textColor="@color/text_grey"
+        android:textColor="@color/light_gray"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="@+id/value_one"
         app:layout_constraintStart_toStartOf="@id/value_one"
@@ -46,7 +46,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:background="@color/light_grey"
+        android:background="@color/stroke"
         android:fontFamily="@font/nunito_medium"
         android:gravity="center"
         android:inputType="numberDecimal"
@@ -65,7 +65,7 @@
         android:layout_marginTop="16dp"
         android:fontFamily="@font/nunito_semi_bold"
         android:text="Result"
-        android:textColor="@color/text_grey"
+        android:textColor="@color/light_gray"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="@+id/value_one"
         app:layout_constraintTop_toBottomOf="@id/value_two" />
@@ -81,7 +81,7 @@
         app:layout_constraintStart_toStartOf="@id/result_tv"
         app:layout_constraintTop_toBottomOf="@id/result_tv"
         android:layout_marginTop="16dp"
-        android:background="@color/light_grey"
+        android:background="@color/stroke"
         android:padding="8dp"
         android:gravity="center"/>
 
@@ -98,7 +98,7 @@
         app:iconPadding="8dp"
         android:textSize="16sp"
         app:iconTint="@color/white"
-        android:backgroundTint="@color/blue_color"
+        android:backgroundTint="@color/app_color"
         app:layout_constraintTop_toBottomOf="@id/result_value"
         app:layout_constraintStart_toStartOf="@id/result_value"
         app:layout_constraintEnd_toEndOf="@id/result_value"

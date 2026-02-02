@@ -24,7 +24,6 @@ object UnitConverter {
         }
     }
 
-    // ------------------ Length ------------------
     private fun convertLength(value: Double, fromUnit: String, toUnit: String): Double {
         val meters = when (fromUnit) {
             "Meters" -> value

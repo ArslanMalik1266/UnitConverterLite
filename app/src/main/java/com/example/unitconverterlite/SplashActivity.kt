@@ -6,12 +6,25 @@ import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.example.unitconverterlite.utils.ThemePreferences
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 
 class SplashActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        val themePrefs = ThemePreferences(this)
+        runBlocking {
+            val isDark = themePrefs.isDarkMode.first()
+            AppCompatDelegate.setDefaultNightMode(
+                if (isDark) AppCompatDelegate.MODE_NIGHT_YES
+                else AppCompatDelegate.MODE_NIGHT_NO
+            )
+        }
 
         installSplashScreen()
         super.onCreate(savedInstanceState)

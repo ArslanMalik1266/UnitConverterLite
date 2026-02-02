@@ -14,7 +14,7 @@
     android:text="What is"
     android:fontFamily="@font/nunito_regular"
     android:textSize="18sp"
-    android:textColor="@color/text_grey"
+    android:textColor="@color/light_gray"
     app:layout_constraintTop_toTopOf="parent"
     app:layout_constraintStart_toStartOf="parent" />
     <EditText
@@ -29,7 +29,7 @@
         app:layout_constraintStart_toStartOf="@id/what_is_tv"
         app:layout_constraintTop_toBottomOf="@id/what_is_tv"
         android:layout_marginTop="16dp"
-        android:background="@color/light_grey"
+        android:background="@color/stroke"
         android:padding="8dp"
         android:gravity="center"/>
 
@@ -38,7 +38,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="% Of"
-        android:textColor="@color/text_grey"
+        android:textColor="@color/light_gray"
         android:textSize="18sp"
         android:fontFamily="@font/nunito_semi_bold"
         app:layout_constraintStart_toStartOf="@id/what_is_value"
@@ -57,7 +57,7 @@
         app:layout_constraintStart_toStartOf="@id/percentage_of_tv"
         app:layout_constraintTop_toBottomOf="@id/percentage_of_tv"
         android:layout_marginTop="16dp"
-        android:background="@color/light_grey"
+        android:background="@color/stroke"
         android:padding="8dp"
         android:gravity="center"/>
 
@@ -66,7 +66,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Result"
-        android:textColor="@color/text_grey"
+        android:textColor="@color/light_gray"
         android:textSize="18sp"
         android:fontFamily="@font/nunito_semi_bold"
         app:layout_constraintStart_toStartOf="@id/percent_of_value"
@@ -84,7 +84,7 @@
         app:layout_constraintStart_toStartOf="@id/result_tv"
         app:layout_constraintTop_toBottomOf="@id/result_tv"
         android:layout_marginTop="16dp"
-        android:background="@color/light_grey"
+        android:background="@color/stroke"
         android:padding="8dp"
         android:gravity="center"/>
 
@@ -94,7 +94,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="32dp"
         android:layout_marginTop="48dp"
-        android:backgroundTint="@color/blue_color"
+        android:backgroundTint="@color/app_color"
         android:fontFamily="@font/nunito_medium"
         android:padding="12dp"
         android:text="Copy Result"

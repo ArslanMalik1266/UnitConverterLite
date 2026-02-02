@@ -22,7 +22,7 @@
         android:textSize="14sp"
        android:background="@drawable/searchbar_border"
         android:textColor="@color/black"
-        android:textColorHint="@color/text_grey"
+        android:textColorHint="@color/light_gray"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

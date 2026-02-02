@@ -5,12 +5,22 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RadioGroup
+import android.widget.Switch
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.lifecycle.lifecycleScope
 import com.example.unitconverterlite.MainActivity
 import com.example.unitconverterlite.R
+import com.example.unitconverterlite.utils.AppPreferences
+import com.example.unitconverterlite.utils.ThemePreferences
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.radiobutton.MaterialRadioButton
+import kotlinx.coroutines.launch
 
 
 class SettingsFragment : Fragment() {
+
+    private lateinit var mode_swtich : Switch
 
     override fun onResume() {
         super.onResume()
@@ -25,6 +35,80 @@ class SettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val themePrefs = ThemePreferences(requireContext())
+        val appPrefs = AppPreferences(requireContext())
+        val radioGroup = view.findViewById<RadioGroup>(R.id.radioGroup)
+        val noDecimalRadio = view.findViewById<MaterialRadioButton>(R.id.no_decimal_radio)
+        val twoDecimalRadio = view.findViewById<MaterialRadioButton>(R.id.two_decimal_radio)
+        val fourDecimalRadio = view.findViewById<MaterialRadioButton>(R.id.four_decimal_radio)
+
+        lifecycleScope.launch {
+            appPrefs.decimalPrecisionFlow.collect { savedValue ->
+                when (savedValue) {
+                    0 -> noDecimalRadio.isChecked = true
+                    2 -> twoDecimalRadio.isChecked = true
+                    4 -> fourDecimalRadio.isChecked = true
+                }
+            }
+        }
+        radioGroup.setOnCheckedChangeListener { _, checkedId ->
+            val selectedValue = when (checkedId) {
+                R.id.no_decimal_radio -> 0
+                R.id.two_decimal_radio -> 2
+                R.id.four_decimal_radio -> 4
+                else -> 2
+            }
+            lifecycleScope.launch {
+                appPrefs.saveDecimalPrecision(selectedValue)
+            }
+
+        }
+
+
+        mode_swtich = view.findViewById<Switch>(R.id.mode_swtich)
+        val autosaveSwitch = view.findViewById<Switch>(R.id.autosave_swtich)
+
+        lifecycleScope.launch {
+            appPrefs.isAutoSaveEnabled.collect { enabled ->
+                if (autosaveSwitch.isChecked != enabled) {
+                    autosaveSwitch.isChecked = enabled
+                }
+            }
+        }
+
+        autosaveSwitch.setOnCheckedChangeListener { _, isChecked ->
+            lifecycleScope.launch {
+                appPrefs.saveAutoSave(isChecked)
+
+            }
+        }
+
+
+        lifecycleScope.launch {
+            themePrefs.isDarkMode.collect { isDark ->
+                if (mode_swtich.isChecked != isDark) {
+                    mode_swtich.isChecked = isDark
+                }
+            }
+        }
+
+        mode_swtich.setOnCheckedChangeListener { _, isChecked ->
+
+            lifecycleScope.launch {
+                themePrefs.saveDarkMode(isChecked)
+                kotlinx.coroutines.delay(200)
+
+                AppCompatDelegate.setDefaultNightMode(
+                    if (isChecked)
+                        AppCompatDelegate.MODE_NIGHT_YES
+                    else
+                        AppCompatDelegate.MODE_NIGHT_NO
+                )
+            }
+        }
+
+
         val toolbar = view.findViewById<MaterialToolbar>(R.id.topAppBar)
         toolbar.setNavigationOnClickListener {
             requireActivity().onBackPressed()
