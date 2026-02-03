@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:padding="24dp"
+    android:padding="16dp"
     tools:context=".fragments.PercentageOfFragment">
 
 
@@ -22,7 +22,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:drawableEnd="@drawable/perc_icon"
         android:drawableTint="@color/black"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:paddingStart="18dp"
         android:background="@color/stroke"
         android:padding="8dp"
@@ -33,6 +33,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:padding="6dp"
         android:fontFamily="@font/nunito_semi_bold"
         android:src="@drawable/minus_icon"
         android:textColor="@color/light_gray"
@@ -80,30 +81,12 @@
         android:inputType="numberDecimal"
         app:layout_constraintStart_toStartOf="@id/result_tv"
         app:layout_constraintTop_toBottomOf="@id/result_tv"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:background="@color/stroke"
         android:padding="8dp"
         android:gravity="center"/>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/copy_result_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Copy Result"
-        android:textColor="@color/white"
-        android:fontFamily="@font/nunito_medium"
-        app:icon="@drawable/copy_result_icon"
-        app:iconGravity="textStart"
-        android:padding="12dp"
-        app:iconPadding="8dp"
-        android:textSize="16sp"
-        app:iconTint="@color/white"
-        android:backgroundTint="@color/app_color"
-        app:layout_constraintTop_toBottomOf="@id/result_value"
-        app:layout_constraintStart_toStartOf="@id/result_value"
-        app:layout_constraintEnd_toEndOf="@id/result_value"
-        android:layout_marginTop="48dp"
-        android:layout_marginHorizontal="32dp"/>
+
 
 
 

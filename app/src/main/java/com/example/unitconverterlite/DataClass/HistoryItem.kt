@@ -12,9 +12,5 @@ data class HistoryItem(
     val valueReceived: String,
     val valueReceivedUnit: String,
     val unitName: String,
-    val ratioX: String? = null,
-    val ratioY: String? = null,
-    val bmiHeight: String? = null,
-    val bmiWeight: String? = null
 )
 

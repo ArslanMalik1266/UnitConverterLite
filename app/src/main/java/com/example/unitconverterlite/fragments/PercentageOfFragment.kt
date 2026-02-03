@@ -12,6 +12,7 @@ import com.example.unitconverterlite.R
 import com.example.unitconverterlite.utils.AppPreferences
 import com.example.unitconverterlite.utils.SimpleWatcher
 import com.example.unitconverterlite.viewModel.PercentageViewModel
+import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -47,6 +48,9 @@ class PercentageOfFragment : Fragment() {
         valueOne.requestFocus()
         parentConverterFragment?.activeEditText = valueOne
         parentConverterFragment?.showKeyboard(true)
+        parentConverterFragment?.copyButton?.setOnClickListener {
+            parentConverterFragment?.copyResultFromChild(resultValue.text.toString())
+        }
     }
 
 
@@ -57,10 +61,13 @@ class PercentageOfFragment : Fragment() {
         valueTwo = view.findViewById(R.id.percent_of_value)
         resultValue = view.findViewById(R.id.result_value)
 
+
         valueOne.showSoftInputOnFocus = false
         valueTwo.showSoftInputOnFocus = false
         resultValue.isFocusable = false
         resultValue.isClickable = false
+
+
 
         setupFocusHandling()
         setupTextWatchers()
@@ -75,12 +82,20 @@ class PercentageOfFragment : Fragment() {
 
     private fun setupFocusHandling() {
         valueOne.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) parentConverterFragment?.activeEditText = valueOne
+            if (hasFocus) {
+                parentConverterFragment?.activeEditText = valueOne
+                parentConverterFragment?.showKeyboard(true)
+            }
         }
+
         valueTwo.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) parentConverterFragment?.activeEditText = valueTwo
+            if (hasFocus) {
+                parentConverterFragment?.activeEditText = valueTwo
+                parentConverterFragment?.showKeyboard(true)
+            }
         }
     }
+
 
     private fun setupTextWatchers() {
         valueOne.addTextChangedListener(SimpleWatcher {
@@ -97,5 +112,14 @@ class PercentageOfFragment : Fragment() {
     private fun updateResult() {
         val result = viewModel.calculateOf(localPercent, localBase)
         resultValue.setText(result?.let { viewModel.formatDecimal(it) } ?: "")
+
+    }
+    fun getResultForHistory(): String {
+        return resultValue.text.toString()
+    }
+    fun getValueGivenForHistory(): String {
+        val percent = view?.findViewById<EditText>(R.id.what_is_value)?.text.toString()
+        val base = view?.findViewById<EditText>(R.id.percent_of_value)?.text.toString()
+        return if (percent.isNotEmpty() && base.isNotEmpty()) "$percent% of $base" else ""
     }
 }

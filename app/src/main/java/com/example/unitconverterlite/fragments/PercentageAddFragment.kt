@@ -13,6 +13,7 @@ import com.example.unitconverterlite.R
 import com.example.unitconverterlite.utils.AppPreferences
 import com.example.unitconverterlite.utils.SimpleWatcher
 import com.example.unitconverterlite.viewModel.PercentageViewModel
+import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -21,7 +22,7 @@ class PercentageAddFragment : Fragment() {
     private lateinit var valueOne: EditText       // percent
     private lateinit var valueTwo: EditText       // base
     private lateinit var resultValue: EditText
-    private lateinit var buttonCopy: Button
+    private lateinit var buttonCopy: MaterialButton
 
     private val viewModel: PercentageViewModel by activityViewModels()
     private var parentConverterFragment: UnitConverterFragment? = null
@@ -46,10 +47,10 @@ class PercentageAddFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        // Request focus for valueOne
-        valueOne.requestFocus()
-        parentConverterFragment?.activeEditText = valueOne
-        parentConverterFragment?.showKeyboard(true)
+        parentConverterFragment?.copyButton?.setOnClickListener {
+            parentConverterFragment?.copyResultFromChild(resultValue.text.toString())
+        }
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -66,7 +67,6 @@ class PercentageAddFragment : Fragment() {
         resultValue.isFocusable = false
         resultValue.isClickable = false
 
-        setCopyButtonEnabled(false)
 
         setupFocusHandling()
         setupTextWatchers()
@@ -81,13 +81,20 @@ class PercentageAddFragment : Fragment() {
 
     private fun setupFocusHandling() {
         valueOne.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) parentConverterFragment?.activeEditText = valueOne
+            if (hasFocus) {
+                parentConverterFragment?.activeEditText = valueOne
+                parentConverterFragment?.showKeyboard(true) // show keyboard
+            }
         }
 
         valueTwo.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) parentConverterFragment?.activeEditText = valueTwo
+            if (hasFocus) {
+                parentConverterFragment?.activeEditText = valueTwo
+                parentConverterFragment?.showKeyboard(true) // show keyboard
+            }
         }
     }
+
 
     private fun setupTextWatchers() {
         valueOne.addTextChangedListener(SimpleWatcher {
@@ -105,25 +112,20 @@ class PercentageAddFragment : Fragment() {
         val result = viewModel.calculateAdd(localPercent, localBase)
         if (result != null) {
             resultValue.setText(viewModel.formatDecimal(result))
-            setCopyButtonEnabled(true)
+
         } else {
             resultValue.setText("")
-            setCopyButtonEnabled(false)
         }
     }
 
-    private fun setCopyButtonEnabled(enabled: Boolean) {
-        buttonCopy.isEnabled = enabled
-        if (enabled) {
-            buttonCopy.setBackgroundTintList(
-                resources.getColorStateList(R.color.app_color)
-            )
-            buttonCopy.setTextColor(resources.getColor(R.color.white))
-        } else {
-            buttonCopy.setBackgroundTintList(
-                resources.getColorStateList(R.color.stroke)
-            )
-            buttonCopy.setTextColor(resources.getColor(R.color.light_gray))
-        }
+    fun getResultForHistory(): String {
+        return resultValue.text.toString()
     }
+    fun getValueGivenForHistory(): String {
+        val percent = view?.findViewById<EditText>(R.id.value_one)?.text.toString()
+        val base = view?.findViewById<EditText>(R.id.value_two)?.text.toString()
+        return if (percent.isNotEmpty() && base.isNotEmpty()) "$percent% + $base" else ""
+    }
+
+
 }

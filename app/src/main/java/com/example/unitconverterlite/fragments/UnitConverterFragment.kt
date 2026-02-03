@@ -1,5 +1,6 @@
 package com.example.unitconverterlite.fragments
 
+import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -7,6 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import android.widget.GridLayout.LayoutParams
+import androidx.appcompat.app.ActionBar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -43,17 +46,15 @@ class UnitConverterFragment : Fragment() {
     private lateinit var equalButton: MaterialButton
     private lateinit var keyboard: GridLayout
     private lateinit var switchButton: ImageView
+    private lateinit var viewpager: ViewPager2
     private lateinit var value_one_spinner: Spinner
     private lateinit var value_two_spinner: Spinner
-    private var copyButtons: List<Button> = emptyList()
-    private lateinit var copyButton: MaterialButton
-    private var isUpdating = false
+    internal lateinit var copyButton: MaterialButton
+    var rotated = false
     private lateinit var historyViewModel: HistoryViewModel
     private val ratioViewModel: RatioViewModel by activityViewModels()
     private val bmiViewModel: BMIViewModel by activityViewModels()
     private val unitConverterViewModel: UnitConverterViewModel by activityViewModels()
-
-
 
 
     private val unitsMap = mapOf(
@@ -63,21 +64,26 @@ class UnitConverterFragment : Fragment() {
         "Volume" to listOf("Liter", "Milliliter", "Gallon", "Cubic Meter", "Cubic Feet"),
         "Temperature" to listOf("Celsius", "Fahrenheit", "Kelvin"),
         "Weight" to listOf("Kilograms", "Grams", "Pounds", "Ounces"),
-        "Speed" to listOf("m/s", "km/h", "mph", "ft/s"),
+        "Speed" to listOf("meters per second", "kilometers per hour", "miles per hour", "feet per second"),
         "Energy" to listOf("Joule", "Calorie", "kWh", "BTU"),
         "Power" to listOf("Watt", "Kilowatt", "Horsepower"),
-        "Torque" to listOf("Nm", "kg·m", "lb·ft"),
-        "Pressure" to listOf("Pa", "kPa", "Bar", "psi"),
+        "Torque" to listOf("Newton meter", "Kilogram meter", "Pound-foot"),
+        "Pressure" to listOf("Pascal", "Kilopascal", "Bar", "Pounds per square inch"),
         "Force" to listOf("Newton", "Kilogram-force", "Pound-force"),
         "Angle" to listOf("Degree", "Radian", "Gradian"),
         "Currency" to listOf("USD", "EUR", "GBP", "JPY", "PKR"),
-        "Sound" to listOf("Decibel"),
+        "Sound" to listOf("Hertz","Kilohertz", "Megahertz", "Pascal", "Micropascal", "Decibel", "Watt per square meter"),
         "BMI" to listOf("Metric", "Imperial")
     )
 
     override fun onResume() {
         super.onResume()
         (activity as? MainActivity)?.showBottomNav(false)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        unitConverterViewModel.resetValues()
     }
 
     override fun onCreateView(
@@ -96,6 +102,7 @@ class UnitConverterFragment : Fragment() {
         val toolbar = view.findViewById<MaterialToolbar>(R.id.unitConverter_appBar)
         val cardTitle = arguments?.getString("title") ?: "Unit Converter"
         val cardType = arguments?.getString("type") ?: "Length"
+        copyButton = view.findViewById<MaterialButton>(R.id.copy_result_btn)
 
         toolbar.title = cardTitle
         historyViewModel = ViewModelProvider(
@@ -112,8 +119,13 @@ class UnitConverterFragment : Fragment() {
         switchButton = view.findViewById<ImageView>(R.id.switching_unit_icon)
         value_one_spinner = view.findViewById<Spinner>(R.id.value_one_spinner)
         value_two_spinner = view.findViewById<Spinner>(R.id.value_two_spinner)
-        valueOne =view.findViewById<EditText>(R.id.value_one)
-        valueTwo =view.findViewById<EditText>(R.id.value_two)
+        valueOne = view.findViewById<EditText>(R.id.value_one)
+        valueTwo = view.findViewById<EditText>(R.id.value_two)
+        viewpager = view.findViewById<ViewPager2>(R.id.percentage_view_pager)
+
+
+
+        setCopyButtonEnabled(false)
 
 
         // Hide all
@@ -121,7 +133,6 @@ class UnitConverterFragment : Fragment() {
             it.visibility = View.GONE
         }
 
-        // Show relevant layout
         when (cardType) {
             "Percentage" -> {
                 layoutPercentage.visibility = View.VISIBLE
@@ -144,13 +155,6 @@ class UnitConverterFragment : Fragment() {
             }
         }
 
-        // Copy buttons
-        copyButtons = listOf(
-            view.findViewById(R.id.copy_result_btn),
-            view.findViewById(R.id.copy_result_ratio_btn),
-            view.findViewById(R.id.copy_result_bmi_btn)
-        )
-        copyButtons.forEach { setCopyButtonEnabled(it, false) }
 
         // Insets
         ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
@@ -159,8 +163,22 @@ class UnitConverterFragment : Fragment() {
             insets
         }
         switchButton()
-    }
 
+        copyButton.setOnClickListener {
+            val resultText = when {
+                ratioUI.visibility == View.VISIBLE -> view.findViewById<EditText>(R.id.result_value).text.toString()
+                bmiUI.visibility == View.VISIBLE -> view.findViewById<EditText>(R.id.result_bmi_value).text.toString()
+                else -> valueTwo.text.toString()
+            }
+
+            if (resultText.isNotEmpty()) {
+                val clipboard =
+                    requireContext().getSystemService(android.content.ClipboardManager::class.java)
+                val clip = android.content.ClipData.newPlainText("result", resultText)
+                clipboard.setPrimaryClip(clip)
+            }
+        }
+    }
 
 
     private fun setupRegularUI(view: View, cardType: String) {
@@ -168,10 +186,14 @@ class UnitConverterFragment : Fragment() {
         val spinnerTwo = view.findViewById<Spinner>(R.id.value_two_spinner)
 
         val units = unitsMap[cardType] ?: listOf("Unit1", "Unit2")
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, units)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerOne.adapter = adapter
-        spinnerTwo.adapter = adapter
+        val adapter1 = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, units)
+        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        val adapter2 = ArrayAdapter(requireContext(), R.layout.spinner_dropdown_item, units)
+        adapter2.setDropDownViewResource(R.layout.spinner_dropdown_item)
+        spinnerOne.adapter = adapter1
+        spinnerTwo.adapter = adapter2
+        spinnerOne.setSelection(0)
+        spinnerTwo.setSelection(1)
         spinnerOne.post {
             spinnerOne.dropDownWidth = spinnerOne.width
         }
@@ -220,7 +242,12 @@ class UnitConverterFragment : Fragment() {
             })
 
             spinnerOne.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
                     val fromUnit = spinnerOne.selectedItem.toString()
                     val toUnit = spinnerTwo.selectedItem.toString()
                     val type = arguments?.getString("type") ?: "Length"
@@ -232,11 +259,17 @@ class UnitConverterFragment : Fragment() {
                         decimalPrecision
                     )
                 }
+
                 override fun onNothingSelected(parent: AdapterView<*>?) {}
             }
 
             spinnerTwo.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
                     val fromUnit = spinnerOne.selectedItem.toString()
                     val toUnit = spinnerTwo.selectedItem.toString()
                     val type = arguments?.getString("type") ?: "Length"
@@ -248,6 +281,7 @@ class UnitConverterFragment : Fragment() {
                         decimalPrecision
                     )
                 }
+
                 override fun onNothingSelected(parent: AdapterView<*>?) {}
             }
         }
@@ -284,12 +318,11 @@ class UnitConverterFragment : Fragment() {
     }
 
 
-
     private fun setupRatioUI(view: View) {
         val xValue = view.findViewById<EditText>(R.id.x_value)
         val yValue = view.findViewById<EditText>(R.id.y_value)
         val resultValue = view.findViewById<EditText>(R.id.result_value)
-        copyButton = view.findViewById(R.id.copy_result_ratio_btn)
+        copyButton = view.findViewById(R.id.copy_result_btn)
 
         setupEditText(xValue)
         setupEditText(yValue)
@@ -322,14 +355,14 @@ class UnitConverterFragment : Fragment() {
         copyButton.setOnClickListener {
             val text = resultValue.text.toString()
             if (text.isNotEmpty()) {
-                val clipboard = requireContext().getSystemService(android.content.ClipboardManager::class.java)
+                val clipboard =
+                    requireContext().getSystemService(android.content.ClipboardManager::class.java)
                 val clip = android.content.ClipData.newPlainText("ratio", text)
                 clipboard.setPrimaryClip(clip)
                 Toast.makeText(requireContext(), "Copied: $text", Toast.LENGTH_SHORT).show()
             }
         }
     }
-
 
 
     private fun setCopyButtonEnabled(enabled: Boolean) {
@@ -359,7 +392,7 @@ class UnitConverterFragment : Fragment() {
         val inchesEt = view.findViewById<EditText>(R.id.inches_value)
         val weightEt = view.findViewById<EditText>(R.id.weight_value)
         val resultEt = view.findViewById<EditText>(R.id.result_bmi_value)
-        copyButton = view.findViewById(R.id.copy_result_bmi_btn)
+        copyButton = view.findViewById(R.id.copy_result_btn)
 
         listOf(feetEt, inchesEt, weightEt).forEach { setupEditText(it) }
 
@@ -394,7 +427,8 @@ class UnitConverterFragment : Fragment() {
         copyButton.setOnClickListener {
             val text = resultEt.text.toString()
             if (text.isNotEmpty()) {
-                val clipboard = requireContext().getSystemService(android.content.ClipboardManager::class.java)
+                val clipboard =
+                    requireContext().getSystemService(android.content.ClipboardManager::class.java)
                 val clip = android.content.ClipData.newPlainText("BMI", text)
                 clipboard.setPrimaryClip(clip)
                 Toast.makeText(requireContext(), "Copied: $text", Toast.LENGTH_SHORT).show()
@@ -449,7 +483,7 @@ class UnitConverterFragment : Fragment() {
             val param = GridLayout.LayoutParams(
                 GridLayout.spec(index / 3, 1f),
                 GridLayout.spec(index % 3, 1f)
-            ).apply { width = 0; height = 0; setMargins(4, 4, 4, 4) }
+            ).apply { width = 0; height = 0; setMargins(8, 4, 8, 4) }
 
             button.layoutParams = param
             button.setOnClickListener { handleKeyboardInput(label) }
@@ -470,16 +504,19 @@ class UnitConverterFragment : Fragment() {
                     if (autoSaveEnabled) {
                         performConversionAndSaveHistory()
                     } else {
-                     // just calculate without saving
+                        // just calculate without saving
                     }
                 }
             }
         }
 
-        val equalParams = GridLayout.LayoutParams(
-            GridLayout.spec(4, 1f),
-            GridLayout.spec(0, 3, 1f)
-        ).apply { width = 0; height = 0 }
+        val equalParams = LayoutParams(
+            GridLayout.spec(4),
+            GridLayout.spec(0, 3)
+        ).apply {
+            width = LayoutParams.MATCH_PARENT
+            width = LayoutParams.MATCH_PARENT
+        }
 
         equalButton.layoutParams = equalParams
         keyboard.addView(equalButton)
@@ -516,8 +553,8 @@ class UnitConverterFragment : Fragment() {
 
     private fun handleEqualClick() {
         showKeyboard(false)
-        copyButtons.forEach { setCopyButtonEnabled(it, hasValue(activeEditText)) }
         updateEqualButtonState(false)
+        setCopyButtonEnabled(copyButton, true)
     }
 
     internal fun updateEqualButtonState(enabled: Boolean) {
@@ -534,11 +571,12 @@ class UnitConverterFragment : Fragment() {
     private fun setCopyButtonEnabled(button: Button?, enabled: Boolean) {
         button?.isEnabled = enabled
         if (enabled) {
+            button?.visibility = View.VISIBLE
             button?.setBackgroundColor(resources.getColor(R.color.app_color))
             button?.setTextColor(resources.getColor(R.color.white))
         } else {
-            button?.setBackgroundColor(resources.getColor(R.color.stroke))
-            button?.setTextColor(resources.getColor(R.color.light_gray))
+         button?.visibility = View.GONE
+
         }
     }
 
@@ -555,25 +593,25 @@ class UnitConverterFragment : Fragment() {
 
     private fun switchButton() {
         switchButton.setOnClickListener {
-            if (isUpdating) return@setOnClickListener
-
-            isUpdating = true
-
+            val animator = ObjectAnimator.ofFloat(switchButton, "rotation", 0f, 180f)
+            animator.duration = 300
+            animator.start()
             val tempValue = valueOne.text.toString()
-            val tempSpinnerPosition = value_one_spinner.selectedItemPosition
+            val tempValueTwo = valueTwo.text.toString()
 
-            valueOne.setText(valueTwo.text.toString())
+            val tempSpinnerPosition = value_one_spinner.selectedItemPosition
+            val tempSpinnerPositionTwo = value_two_spinner.selectedItemPosition
+
+            valueOne.setText(tempValueTwo)
             valueTwo.setText(tempValue)
 
-            value_one_spinner.setSelection(value_two_spinner.selectedItemPosition)
+            value_one_spinner.setSelection(tempSpinnerPositionTwo)
             value_two_spinner.setSelection(tempSpinnerPosition)
-
-            isUpdating = false
         }
     }
 
 
-    private fun addHistory(
+    internal fun addHistory(
         valueGiven: String,
         valueGivenUnit: String,
         valueReceived: String,
@@ -593,6 +631,7 @@ class UnitConverterFragment : Fragment() {
 
 
     }
+
     private fun performConversionAndSaveHistory() {
         val type = arguments?.getString("type") ?: "Length"
 
@@ -600,19 +639,21 @@ class UnitConverterFragment : Fragment() {
             "BMI" -> {
                 val feet = view?.findViewById<EditText>(R.id.feet_value)?.text.toString()
                 val inches = view?.findViewById<EditText>(R.id.inches_value)?.text.toString()
+                val weight_kg = view?.findViewById<TextView>(R.id.kg_tv)?.text.toString()
                 val weight = view?.findViewById<EditText>(R.id.weight_value)?.text.toString()
                 val result = view?.findViewById<EditText>(R.id.result_bmi_value)?.text.toString()
 
                 if (feet.isNotEmpty() && inches.isNotEmpty() && weight.isNotEmpty() && result.isNotEmpty()) {
                     addHistory(
-                        valueGiven = "$feet ft, $inches inch,",
-                        valueGivenUnit = weight,
+                        valueGiven = "$feet'$inches $weight",
+                        valueGivenUnit = weight_kg,
                         valueReceived = result,
-                        valueReceivedUnit = "BMI",
+                        valueReceivedUnit = "",
                         unitName = "BMI"
                     )
                 }
             }
+
 
             "Ratio" -> {
                 val x = view?.findViewById<EditText>(R.id.x_value)?.text.toString()
@@ -629,6 +670,43 @@ class UnitConverterFragment : Fragment() {
                     )
                 }
             }
+
+            "Percentage" -> {
+
+                val currentFragment = (viewpager.adapter as? PercentagePagerAdapter)
+                    ?.getFragmentAt(viewpager.currentItem)
+
+                val valueGiven = when (currentFragment) {
+                    is PercentageOfFragment -> currentFragment.getValueGivenForHistory()
+                    is PercentageAddFragment -> currentFragment.getValueGivenForHistory()
+                    is PercentageSubtractFragment -> currentFragment.getValueGivenForHistory()
+                    else -> ""
+                }
+                val valueReceived = when (currentFragment) {
+                    is PercentageOfFragment -> currentFragment.getResultForHistory()
+                    is PercentageAddFragment -> currentFragment.getResultForHistory()
+                    is PercentageSubtractFragment -> currentFragment.getResultForHistory()
+                    else -> ""
+                }
+                if (valueGiven.isNotEmpty() && valueReceived.isNotEmpty()) {
+                    val unitName = when (viewpager.currentItem) {
+                        0 -> "Percentage"
+                        1 -> "Percentage"
+                        2 -> "Percentage"
+                        else -> "Percentage"
+                    }
+
+                    addHistory(
+                        valueGiven = valueGiven,
+                        valueGivenUnit = "",
+                        valueReceived = valueReceived,
+                        valueReceivedUnit = "",
+                        unitName = unitName
+                    )
+                }
+
+            }
+
 
             else -> {
                 val valueGiven = valueOne.text.toString()
@@ -649,6 +727,15 @@ class UnitConverterFragment : Fragment() {
         }
     }
 
+    fun copyResultFromChild(resultText: String) {
+        if (resultText.isNotEmpty()) {
+            val clipboard =
+                requireContext().getSystemService(android.content.ClipboardManager::class.java)
+            val clip = android.content.ClipData.newPlainText("result", resultText)
+            clipboard.setPrimaryClip(clip)
+            Toast.makeText(requireContext(), "Copied: $resultText", Toast.LENGTH_SHORT).show()
+        }
+    }
 
 
 }

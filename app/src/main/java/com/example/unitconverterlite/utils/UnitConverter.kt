@@ -19,7 +19,6 @@ object UnitConverter {
             "Angle" -> convertAngle(value, fromUnit, toUnit)
             "Currency" -> convertCurrency(value, fromUnit, toUnit)
             "Sound" -> convertSound(value, fromUnit, toUnit)
-            "BMI" -> convertBMI(value, fromUnit, toUnit)
             else -> value
         }
     }
@@ -140,17 +139,17 @@ object UnitConverter {
     // ------------------ Speed ------------------
     private fun convertSpeed(value: Double, fromUnit: String, toUnit: String): Double {
         val mps = when (fromUnit) {
-            "m/s" -> value
-            "km/h" -> value / 3.6
-            "mph" -> value * 0.44704
-            "ft/s" -> value * 0.3048
+            "meters per second" -> value
+            "kilometers per hour" -> value / 3.6
+            "miles per hour" -> value * 0.44704
+            "feet per second" -> value * 0.3048
             else -> value
         }
         return when (toUnit) {
-            "m/s" -> mps
-            "km/h" -> mps * 3.6
-            "mph" -> mps / 0.44704
-            "ft/s" -> mps / 0.3048
+            "meters per second" -> mps
+            "kilometers per hour" -> mps * 3.6
+            "miles per hour" -> mps / 0.44704
+            "feet per second" -> mps / 0.3048
             else -> mps
         }
     }
@@ -192,15 +191,15 @@ object UnitConverter {
     // ------------------ Torque ------------------
     private fun convertTorque(value: Double, fromUnit: String, toUnit: String): Double {
         val nm = when (fromUnit) {
-            "Nm" -> value
-            "kg·m" -> value * 9.80665
-            "lb·ft" -> value * 1.35582
+            "Newton meter" -> value
+            "Kilogram meter" -> value * 9.80665
+            "Pound-foot" -> value * 1.35582
             else -> value
         }
         return when (toUnit) {
-            "Nm" -> nm
-            "kg·m" -> nm / 9.80665
-            "lb·ft" -> nm / 1.35582
+            "Newton meter" -> nm
+            "Kilogram meter" -> nm / 9.80665
+            "Pound-foot" -> nm / 1.35582
             else -> nm
         }
     }
@@ -208,17 +207,17 @@ object UnitConverter {
     // ------------------ Pressure ------------------
     private fun convertPressure(value: Double, fromUnit: String, toUnit: String): Double {
         val pa = when (fromUnit) {
-            "Pa" -> value
-            "kPa" -> value * 1000
+            "Pascal" -> value
+            "Kilopascal" -> value * 1000
             "Bar" -> value * 100000
-            "psi" -> value * 6894.76
+            "Pounds per square inch" -> value * 6894.76
             else -> value
         }
         return when (toUnit) {
-            "Pa" -> pa
-            "kPa" -> pa / 1000
+            "Pascal" -> pa
+            "Kilopascal" -> pa / 1000
             "Bar" -> pa / 100000
-            "psi" -> pa / 6894.76
+            "Pounds per square inch" -> pa / 6894.76
             else -> pa
         }
     }
@@ -270,12 +269,56 @@ object UnitConverter {
 
     // ------------------ Sound ------------------
     private fun convertSound(value: Double, fromUnit: String, toUnit: String): Double {
-        return value // only decibel, no conversion needed
+
+        // -------- Frequency --------
+        if (fromUnit in listOf("Hertz", "Kilohertz", "Megahertz") &&
+            toUnit in listOf("Hertz", "Kilohertz", "Megahertz")
+        ) {
+            val hz = when (fromUnit) {
+                "Hertz" -> value
+                "Kilohertz" -> value * 1_000
+                "Megahertz" -> value * 1_000_000
+                else -> value
+            }
+
+            return when (toUnit) {
+                "Hertz" -> hz
+                "Kilohertz" -> hz / 1_000
+                "Megahertz" -> hz / 1_000_000
+                else -> hz
+            }
+        }
+
+        // -------- Sound Pressure --------
+        if (fromUnit in listOf("Pascal", "Micropascal") &&
+            toUnit in listOf("Pa", "µPa")
+        ) {
+            val pa = when (fromUnit) {
+                "Pascal" -> value
+                "Micropascal" -> value / 1_000_000
+                else -> value
+            }
+
+            return when (toUnit) {
+                "Pascal" -> pa
+                "Micropascal" -> pa * 1_000_000
+                else -> pa
+            }
+        }
+
+        // -------- Decibel (no conversion) --------
+        if (fromUnit == "Decibel" && toUnit == "Decibel") {
+            return value
+        }
+
+        if (fromUnit == "Watt per square meter" && toUnit == "Watt per square meter") {
+            return value
+        }
+
+        return value
     }
 
-    // ------------------ BMI ------------------
-    private fun convertBMI(value: Double, fromUnit: String, toUnit: String): Double {
-        return value // BMI is usually calculated, not converted
-    }
+
+
 
 }

@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingHorizontal="16dp"
     android:background="@color/white"
     tools:context=".fragments.HistoryFragment">
 
@@ -50,15 +51,23 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <Switch
+        <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/mode_swtich"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:checked="false"
+            android:thumb="@drawable/thumb_selector"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/light_mode_tv"
             app:layout_constraintBottom_toBottomOf="@id/light_mode_tv"
-            android:thumbTint="@color/white"
-            android:track="@drawable/custom_swtich_track"/>
+            app:thumbTint="@null"
+            android:padding="0dp"
+            app:thumbTextPadding="0dp"
+            app:track="@drawable/track_selector"
+            app:trackTint="@null"
+            android:scaleX="0.8"
+            android:scaleY="0.8" />
+
 
 
 
@@ -84,16 +93,23 @@
             app:layout_constraintTop_toBottomOf="@id/notifications_view"
             app:layout_constraintStart_toStartOf="@id/notifications_view"/>
 
-        <Switch
+
+        <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/autosave_swtich"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:checked="false"
+            android:thumb="@drawable/thumb_selector"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/auto_save_tv"
             app:layout_constraintBottom_toBottomOf="@id/auto_save_tv"
-            android:thumbTint="@color/white"
-            android:track="@drawable/custom_swtich_track"
-            />
+            app:thumbTint="@null"
+            android:padding="0dp"
+            app:thumbTextPadding="0dp"
+            app:track="@drawable/track_selector"
+            app:trackTint="@null"
+            android:scaleX="0.8"
+            android:scaleY="0.8" />
 
         <View
             android:id="@+id/auto_save_view"
@@ -210,7 +226,7 @@
             app:layout_constraintTop_toTopOf="@id/version_tv"
             app:layout_constraintBottom_toBottomOf="@id/version_tv"
             app:layout_constraintEnd_toEndOf="parent"
-            android:text="1.0.0"
+            android:text="1.0"
             android:fontFamily="@font/nunito_light"
             android:gravity="end"
             android:textSize="12sp"
@@ -262,7 +278,7 @@
             android:textSize="12sp"
             android:fontFamily="@font/nunito_light"
             android:gravity="end"
-            android:text="January 2025"
+            android:text="March 2025"
             app:layout_constraintStart_toEndOf="@id/latest_update_tv"
             app:layout_constraintTop_toTopOf="@id/latest_update_tv"
             app:layout_constraintBottom_toBottomOf="@id/latest_update_tv"

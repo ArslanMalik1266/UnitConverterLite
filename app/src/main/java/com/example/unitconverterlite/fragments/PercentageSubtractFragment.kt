@@ -12,13 +12,14 @@ import androidx.fragment.app.activityViewModels
 import com.example.unitconverterlite.R
 import com.example.unitconverterlite.utils.SimpleWatcher
 import com.example.unitconverterlite.viewModel.PercentageViewModel
+import com.google.android.material.button.MaterialButton
 
 class PercentageSubtractFragment : Fragment() {
 
     private lateinit var valueOne: EditText       // percent
     private lateinit var valueTwo: EditText       // base
     private lateinit var resultValue: EditText
-    private lateinit var buttonCopy: Button
+    private lateinit var buttonCopy: MaterialButton
 
     private val viewModel: PercentageViewModel by activityViewModels()
     private var parentConverterFragment: UnitConverterFragment? = null
@@ -46,6 +47,10 @@ class PercentageSubtractFragment : Fragment() {
         valueOne.requestFocus()
         parentConverterFragment?.activeEditText = valueOne
         parentConverterFragment?.showKeyboard(true)
+        parentConverterFragment?.copyButton?.setOnClickListener {
+            parentConverterFragment?.copyResultFromChild(resultValue.text.toString())
+        }
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -54,7 +59,7 @@ class PercentageSubtractFragment : Fragment() {
         valueOne = view.findViewById(R.id.value_one)
         valueTwo = view.findViewById(R.id.value_two)
         resultValue = view.findViewById(R.id.result_value)
-        buttonCopy = view.findViewById(R.id.copy_result_btn)
+        buttonCopy = view.findViewById<MaterialButton>(R.id.copy_result_btn)
 
         valueOne.showSoftInputOnFocus = false
         valueTwo.showSoftInputOnFocus = false
@@ -62,7 +67,6 @@ class PercentageSubtractFragment : Fragment() {
         resultValue.isFocusable = false
         resultValue.isClickable = false
 
-        setCopyButtonEnabled(false)
         setupFocusHandling()
         setupTextWatchers()
 
@@ -71,13 +75,20 @@ class PercentageSubtractFragment : Fragment() {
 
     private fun setupFocusHandling() {
         valueOne.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) parentConverterFragment?.activeEditText = valueOne
+            if (hasFocus) {
+                parentConverterFragment?.activeEditText = valueOne
+                parentConverterFragment?.showKeyboard(true)
+            }
         }
 
         valueTwo.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) parentConverterFragment?.activeEditText = valueTwo
+            if (hasFocus) {
+                parentConverterFragment?.activeEditText = valueTwo
+                parentConverterFragment?.showKeyboard(true)
+            }
         }
     }
+
 
     private fun setupTextWatchers() {
         valueOne.addTextChangedListener(SimpleWatcher {
@@ -96,26 +107,21 @@ class PercentageSubtractFragment : Fragment() {
         if (result != null) {
             resultValue.setText(
                 if (result % 1.0 == 0.0) result.toInt().toString() else viewModel.formatDecimal(result)
+
             )
-            setCopyButtonEnabled(true)
         } else {
             resultValue.setText("")
-            setCopyButtonEnabled(false)
         }
     }
 
-    private fun setCopyButtonEnabled(enabled: Boolean) {
-        buttonCopy.isEnabled = enabled
-        if (enabled) {
-            buttonCopy.setBackgroundTintList(
-                ContextCompat.getColorStateList(requireContext(), R.color.app_color)
-            )
-            buttonCopy.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-        } else {
-            buttonCopy.setBackgroundTintList(
-                ContextCompat.getColorStateList(requireContext(), R.color.stroke)
-            )
-            buttonCopy.setTextColor(ContextCompat.getColor(requireContext(), R.color.light_gray))
-        }
+    fun getResultForHistory(): String {
+        return resultValue.text.toString()
     }
+    fun getValueGivenForHistory(): String {
+        val percent = view?.findViewById<EditText>(R.id.value_one)?.text.toString()
+        val base = view?.findViewById<EditText>(R.id.value_two)?.text.toString()
+        return if (percent.isNotEmpty() && base.isNotEmpty()) "$percent % - $base" else ""
+    }
+
+
 }

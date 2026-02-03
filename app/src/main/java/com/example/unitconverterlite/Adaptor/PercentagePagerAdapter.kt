@@ -16,4 +16,8 @@ class PercentagePagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment
 
     override fun getItemCount() = fragments.size
     override fun createFragment(position: Int) = fragments[position]
+
+    fun getFragmentAt(position: Int): Fragment? {
+        return if (position in 0 until fragments.size) fragments[position] else null
+    }
 }

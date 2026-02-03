@@ -19,6 +19,8 @@
             app:navigationIcon="@drawable/back_arrow"
             app:title="Time"
             app:titleTextAppearance="@style/ToolbarTitle" />
+
+
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -33,7 +35,7 @@
             android:id="@+id/value_one"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="20dp"
             android:background="@null"
             android:fontFamily="@font/nunito_regular"
             android:gravity="center_horizontal"
@@ -60,6 +62,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
+            android:padding="8dp"
             android:src="@drawable/switching_unit_icon"
             app:layout_constraintEnd_toEndOf="@id/value_one_spinner"
             app:layout_constraintStart_toStartOf="@id/value_one"
@@ -91,25 +94,7 @@
             app:layout_constraintStart_toEndOf="@id/value_two"
             app:layout_constraintTop_toTopOf="@id/value_two" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/copy_result_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="32dp"
-            android:layout_marginTop="48dp"
-            android:backgroundTint="@color/app_color"
-            android:fontFamily="@font/nunito_medium"
-            android:padding="12dp"
-            android:text="Copy Result"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            app:icon="@drawable/copy_result_icon"
-            app:iconGravity="textStart"
-            app:iconPadding="8dp"
-            app:iconTint="@color/white"
-            app:layout_constraintEnd_toEndOf="@id/value_two_spinner"
-            app:layout_constraintStart_toStartOf="@id/value_two"
-            app:layout_constraintTop_toBottomOf="@id/value_two" />
+
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -239,25 +224,6 @@
             app:layout_constraintStart_toStartOf="@id/result_tv"
             app:layout_constraintTop_toBottomOf="@id/result_tv" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/copy_result_ratio_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="32dp"
-            android:layout_marginTop="48dp"
-            android:backgroundTint="@color/app_color"
-            android:fontFamily="@font/nunito_medium"
-            android:padding="12dp"
-            android:text="Copy Result"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            app:icon="@drawable/copy_result_icon"
-            app:iconGravity="textStart"
-            app:iconPadding="8dp"
-            app:iconTint="@color/white"
-            app:layout_constraintEnd_toEndOf="@id/result_value"
-            app:layout_constraintStart_toStartOf="@id/result_value"
-            app:layout_constraintTop_toBottomOf="@id/result_value" />
 
 
 
@@ -268,20 +234,10 @@
         android:id="@+id/bmi_UI"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="24dp"
+        android:padding="16dp"
         android:visibility="gone"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <TextView
-            android:id="@+id/height_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/nunito_regular"
-            android:text="Height"
-            android:textColor="@color/light_gray"
-            android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/feet_tv"
@@ -294,14 +250,14 @@
             android:textColor="@color/light_gray"
             android:textSize="16sp"
             app:layout_constraintEnd_toStartOf="@id/inches_tv"
-            app:layout_constraintStart_toStartOf="@id/height_tv"
-            app:layout_constraintTop_toBottomOf="@id/height_tv" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
             android:id="@+id/feet_value"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:background="@color/stroke"
             android:fontFamily="@font/nunito_medium"
             android:gravity="center"
@@ -332,7 +288,7 @@
             android:id="@+id/inches_value"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:background="@color/stroke"
             android:fontFamily="@font/nunito_medium"
             android:gravity="center"
@@ -350,10 +306,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:fontFamily="@font/nunito_semi_bold"
+            android:fontFamily="@font/nunito_regular"
             android:text="Weight"
             android:textColor="@color/light_gray"
-            android:textSize="18sp"
+            android:textSize="16sp"
             app:layout_constraintStart_toStartOf="@id/feet_value"
             app:layout_constraintTop_toBottomOf="@id/feet_value" />
 
@@ -361,7 +317,7 @@
             android:id="@+id/weight_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:background="@color/stroke"
             app:layout_constraintStart_toStartOf="@id/weight_tv"
             app:layout_constraintTop_toBottomOf="@id/weight_tv">
@@ -420,30 +376,10 @@
             android:gravity="center"
             android:fontFamily="@font/nunito_medium"
             android:textSize="16sp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:padding="8dp"
             app:layout_constraintStart_toStartOf="@id/result_tv_bmi"
             app:layout_constraintTop_toBottomOf="@id/result_tv_bmi"/>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/copy_result_bmi_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="32dp"
-            android:layout_marginTop="48dp"
-            android:backgroundTint="@color/app_color"
-            android:fontFamily="@font/nunito_medium"
-            android:padding="12dp"
-            android:text="Copy Result"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            app:icon="@drawable/copy_result_icon"
-            app:iconGravity="textStart"
-            app:iconPadding="8dp"
-            app:iconTint="@color/white"
-            app:layout_constraintEnd_toEndOf="@id/result_bmi_value"
-            app:layout_constraintStart_toStartOf="@id/result_bmi_value"
-            app:layout_constraintTop_toBottomOf="@id/result_bmi_value" />
 
 
 
@@ -452,23 +388,47 @@
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/keyboard_constraint"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
         >
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/copy_result_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:backgroundTint="@color/app_color"
+            android:text="Copy Result"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:visibility="gone"
+            app:icon="@drawable/copy_result_icon"
+            app:iconGravity="textStart"
+            app:iconPadding="8dp"
+            app:iconTint="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/keyoboard_grid_layout" />
 
         <GridLayout
             android:id="@+id/keyoboard_grid_layout"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:paddingBottom="8dp"
+            android:padding="8dp"
             android:background="@color/contrast"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintHeight_percent="0.45"
+            app:layout_constraintHeight_percent="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
+\
+
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 
 
