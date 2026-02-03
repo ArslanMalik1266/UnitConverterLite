@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FFFFFF</color>
+    <color name="white">#1E1E1E</color>
+    <color name="stroke">#2A2A2A</color>
+    <color name="light_gray">#CFCFCF</color>
+    <color name="dark_gray">#9A9A9A</color>
+    <color name="app_color">#378DDA</color>
+    <color name="contrast">#242424</color>
+    <color name="appContrast">#40378DDA</color>
+</resources>
