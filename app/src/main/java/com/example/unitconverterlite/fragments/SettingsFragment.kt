@@ -5,19 +5,25 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.ListView
+import android.widget.PopupWindow
 import android.widget.RadioGroup
 import android.widget.Switch
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.SwitchCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.unitconverterlite.MainActivity
 import com.example.unitconverterlite.R
 import com.example.unitconverterlite.utils.AppPreferences
+import com.example.unitconverterlite.utils.LanguagePreferences
 import com.example.unitconverterlite.utils.ThemePreferences
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.radiobutton.MaterialRadioButton
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 
 class SettingsFragment : Fragment() {
@@ -47,6 +53,24 @@ class SettingsFragment : Fragment() {
         val noDecimalRadio = view.findViewById<MaterialRadioButton>(R.id.no_decimal_radio)
         val twoDecimalRadio = view.findViewById<MaterialRadioButton>(R.id.two_decimal_radio)
         val fourDecimalRadio = view.findViewById<MaterialRadioButton>(R.id.four_decimal_radio)
+        val languageSpinner = view.findViewById<TextView>(R.id.language_spinner)
+
+        languageSpinner.setOnClickListener {
+            showLanguageDropdown(languageSpinner)
+        }
+        val languagePrefs = LanguagePreferences(requireContext())
+
+        lifecycleScope.launch {
+            languagePrefs.languageFlow.collect { lang ->
+                languageSpinner.text =
+                    if (lang == LanguagePreferences.URDU)
+                        getString(R.string.urdu)
+                    else
+                        getString(R.string.english)
+            }
+        }
+
+
         version = view.findViewById<TextView>(R.id.version_value_tv)
         build = view.findViewById<TextView>(R.id.build_value_tv)
         latest_update = view.findViewById<TextView>(R.id.latest_update_value_tv)
@@ -145,6 +169,46 @@ class SettingsFragment : Fragment() {
         latest_update.text = lastUpdateDate
         version.text = versionName
     }
+
+    private fun showLanguageDropdown(anchor: TextView) {
+        val languages = listOf(getString(R.string.english), getString(R.string.urdu))
+        val langCodes = listOf(LanguagePreferences.ENGLISH, LanguagePreferences.URDU)
+        val languagePrefs = LanguagePreferences(requireContext())
+
+        val listView = ListView(requireContext()).apply {
+            adapter = ArrayAdapter(requireContext(), R.layout.popup_item, languages)
+            divider = null
+        }
+
+        val popupWindow = PopupWindow(
+            listView,
+            anchor.width,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            true
+        )
+
+        popupWindow.setBackgroundDrawable(
+            AppCompatResources.getDrawable(requireContext(), R.drawable.spinner_dropdown_bg)
+        )
+        popupWindow.elevation = 10f
+        popupWindow.showAsDropDown(anchor)
+
+        listView.setOnItemClickListener { _, _, position, _ ->
+            val selectedLangCode = langCodes[position]
+            val selectedLangDisplay = languages[position]
+            anchor.text = selectedLangDisplay
+
+            popupWindow.dismiss()
+
+            runBlocking {
+                languagePrefs.saveLanguage(selectedLangCode)
+            }
+
+            requireActivity().recreate()
+        }
+    }
+
+
 
 
 }

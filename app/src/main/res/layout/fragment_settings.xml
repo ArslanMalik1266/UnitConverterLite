@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     android:paddingHorizontal="16dp"
     android:background="@color/white"
-    tools:context=".fragments.HistoryFragment">
+    tools:context=".fragments.HistoryFragment"
+    android:layoutDirection="locale">
 
 
     <com.google.android.material.appbar.AppBarLayout
@@ -19,7 +20,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/white"
             app:navigationIcon="@drawable/back_arrow"
-            app:title="Settings"
+            app:title="@string/settings_title"
             app:titleTextAppearance="@style/ToolbarTitle" />
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -44,7 +45,7 @@
             android:layout_height="wrap_content"
             android:drawableStart="@drawable/light_mode"
             android:drawablePadding="8dp"
-            android:text="Light Mode"
+            android:text="@string/dark_mode"
             android:textColor="@color/black"
             android:textSize="16sp"
             android:fontFamily="@font/nunito_semi_bold"
@@ -54,7 +55,7 @@
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/mode_swtich"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="16dp"
             android:checked="false"
             android:thumb="@drawable/thumb_selector"
             app:layout_constraintEnd_toEndOf="parent"
@@ -68,11 +69,8 @@
             android:scaleX="0.8"
             android:scaleY="0.8" />
 
-
-
-
         <View
-            android:id="@+id/notifications_view"
+            android:id="@+id/langauge_view"
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:background="@color/stroke"
@@ -80,12 +78,50 @@
             app:layout_constraintTop_toBottomOf="@id/light_mode_tv"/>
 
         <TextView
+            android:id="@+id/language_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/history_autosave"
+            android:drawablePadding="8dp"
+            android:text="@string/language"
+            android:textColor="@color/black"
+            android:layout_marginTop="16dp"
+            android:textSize="16sp"
+            android:fontFamily="@font/nunito_semi_bold"
+            app:layout_constraintTop_toBottomOf="@id/langauge_view"
+            app:layout_constraintStart_toStartOf="@id/langauge_view"/>
+
+
+        <TextView
+            android:id="@+id/language_spinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/nunito_regular"
+            android:gravity="center_vertical"
+            android:drawableRight="@drawable/arrow_down_icon"
+            android:padding="8dp"
+            android:drawablePadding="4dp"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="@id/language_tv"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:popupBackground="@color/white"
+            app:layout_constraintTop_toTopOf="@id/language_tv"/>
+
+        <View
+            android:id="@+id/notifications_view"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/stroke"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/language_tv"/>
+
+        <TextView
             android:id="@+id/auto_save_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawableStart="@drawable/history_autosave"
             android:drawablePadding="8dp"
-            android:text="Auto Save History"
+            android:text="@string/auto_save_history"
             android:textColor="@color/black"
             android:layout_marginTop="16dp"
             android:textSize="16sp"
@@ -97,7 +133,7 @@
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/autosave_swtich"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="16dp"
             android:checked="false"
             android:thumb="@drawable/thumb_selector"
             app:layout_constraintEnd_toEndOf="parent"
@@ -123,7 +159,7 @@
             android:id="@+id/decimal_precision_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Decimal Precision"
+            android:text="@string/decimal_precision"
             app:layout_constraintTop_toBottomOf="@id/auto_save_view"
             app:layout_constraintStart_toStartOf="@id/auto_save_view"
             android:layout_marginTop="16dp"
@@ -149,7 +185,7 @@
                 android:textSize="14sp"
                 android:fontFamily="@font/nunito_regular"
                 android:textColor="@color/light_gray"
-                android:text="No decimals (e.g 42)"/>
+                android:text="@string/no_decimals_e_g_42"/>
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/two_decimal_radio"
@@ -159,7 +195,7 @@
                 android:textSize="14sp"
                 android:fontFamily="@font/nunito_regular"
                 android:textColor="@color/light_gray"
-                android:text="2 Decimals (e.g 42.00)"/>
+                android:text="@string/_2_decimals_e_g_42_00"/>
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/four_decimal_radio"
@@ -169,7 +205,7 @@
                 android:textSize="14sp"
                 android:fontFamily="@font/nunito_regular"
                 android:textColor="@color/light_gray"
-                android:text="4 Decimals (e.g 42.0000)"/>
+                android:text="@string/_4_decimals_e_g_42_0000"/>
 
         </RadioGroup>
 
@@ -195,7 +231,7 @@
             android:id="@+id/about_tv_heading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="About"
+            android:text="@string/about"
             android:textSize="16sp"
             android:textColor="@color/black"
             android:fontFamily="@font/nunito_semi_bold"
@@ -212,7 +248,7 @@
             app:layout_constraintStart_toStartOf="@id/about_tv_heading"
             app:layout_constraintTop_toBottomOf="@id/about_tv_heading"
             android:layout_marginTop="16dp"
-            android:text="Version"
+            android:text="@string/version"
             android:textSize="12sp"
             android:fontFamily="@font/nunito_light"
             android:textColor="@color/light_gray"
@@ -236,7 +272,7 @@
             android:id="@+id/build_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Build"
+            android:text="@string/build"
             android:textSize="12sp"
             android:fontFamily="@font/nunito_light"
             android:textColor="@color/light_gray"
@@ -262,7 +298,7 @@
             android:id="@+id/latest_update_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Latest Update"
+            android:text="@string/latest_update"
             android:textSize="12sp"
             android:fontFamily="@font/nunito_light"
             android:textColor="@color/light_gray"

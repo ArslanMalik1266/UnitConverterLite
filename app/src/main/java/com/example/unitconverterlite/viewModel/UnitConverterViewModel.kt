@@ -1,5 +1,6 @@
 package com.example.unitconverterlite.viewModel
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,9 +18,16 @@ class UnitConverterViewModel : ViewModel() {
     val equalEnabled: LiveData<Boolean> = _equalEnabled
 
     // Call this from Fragment and pass decimal precision
-    fun onValueOneChanged(value: String, fromUnit: String, toUnit: String, type: String, decimalPrecision: Int = 2) {
+    fun onValueOneChanged(
+        value: String,
+        fromUnit: String,
+        toUnit: String,
+        type: String,
+        decimalPrecision: Int = 2,
+        context: Context
+    ) {
         _valueOne.value = value
-        convert(value, fromUnit, toUnit, type, decimalPrecision, isFromOne = true)
+        convert(value, fromUnit, toUnit, type, decimalPrecision, isFromOne = true, context)
     }
 
     fun resetValues() {
@@ -33,7 +41,8 @@ class UnitConverterViewModel : ViewModel() {
         toUnit: String,
         type: String,
         decimalPrecision: Int,
-        isFromOne: Boolean
+        isFromOne: Boolean,
+        context: Context
     ) {
         val input = value.toDoubleOrNull() ?: 0.0
         if (input == 0.0) {
@@ -43,9 +52,9 @@ class UnitConverterViewModel : ViewModel() {
         }
 
         val result = if (isFromOne)
-            UnitConverter.convert(input, fromUnit, toUnit, type)
+            UnitConverter.convert(context,input, fromUnit, toUnit, type)
         else
-            UnitConverter.convert(input, toUnit, fromUnit, type)
+            UnitConverter.convert(context,input, toUnit, fromUnit, type)
 
         val formattedResult = when (decimalPrecision) {
             0 -> result.toInt().toString()

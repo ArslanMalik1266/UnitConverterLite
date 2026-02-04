@@ -1,5 +1,6 @@
 package com.example.unitconverterlite
 
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -14,6 +15,7 @@ import kotlinx.coroutines.runBlocking
 
 
 class SplashActivity : AppCompatActivity() {
+
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
 

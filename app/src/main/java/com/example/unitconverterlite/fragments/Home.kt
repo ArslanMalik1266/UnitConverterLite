@@ -6,11 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.GridLayout
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.unitconverterlite.Adaptor.HomeAdapter
@@ -18,8 +13,6 @@ import com.example.unitconverterlite.DataClass.CardItem
 import com.example.unitconverterlite.DataClass.HomeItem
 import com.example.unitconverterlite.MainActivity
 import com.example.unitconverterlite.R
-import com.google.android.material.bottomnavigation.BottomNavigationView
-
 
 class Home : Fragment() {
 
@@ -33,45 +26,37 @@ class Home : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         val view = inflater.inflate(R.layout.fragment_home, container, false)
         val recycler = view.findViewById<RecyclerView>(R.id.homeRecycler)
 
-
+        fun newUnitConverterFragment() = UnitConverterFragment()
 
         val items = listOf(
+            HomeItem.Header(getString(R.string.header_everyday)),
+            HomeItem.Card(CardItem(getString(R.string.length), R.drawable.length_icon_new, newUnitConverterFragment())),
+            HomeItem.Card(CardItem(getString(R.string.area), R.drawable.area_icon, newUnitConverterFragment())),
+            HomeItem.Card(CardItem(getString(R.string.time), R.drawable.time_icon, newUnitConverterFragment())),
+            HomeItem.Card(CardItem(getString(R.string.volume), R.drawable.volume_icon, newUnitConverterFragment())),
+            HomeItem.Card(CardItem(getString(R.string.temperature), R.drawable.temp_icon, newUnitConverterFragment())),
+            HomeItem.Card(CardItem(getString(R.string.weight), R.drawable.weight_icon, newUnitConverterFragment())),
+            HomeItem.Card(CardItem(getString(R.string.speed), R.drawable.speed_icon, newUnitConverterFragment())),
+            HomeItem.Card(CardItem(getString(R.string.energy), R.drawable.energy_icon, newUnitConverterFragment())),
 
-            HomeItem.Header("Everyday Measurements"),
-            HomeItem.Card(CardItem("Length", R.drawable.length_icon_new, UnitConverterFragment())),
-            HomeItem.Card(CardItem("Area", R.drawable.area_icon, UnitConverterFragment())),
-            HomeItem.Card(CardItem("Time", R.drawable.time_icon, UnitConverterFragment())),
-            HomeItem.Card(CardItem("Volume", R.drawable.volume_icon, UnitConverterFragment())),
-            HomeItem.Card(CardItem("Temperature", R.drawable.temp_icon, UnitConverterFragment())),
-            HomeItem.Card(CardItem("Weight", R.drawable.weight_icon, UnitConverterFragment())),
-            HomeItem.Card(CardItem("Speed", R.drawable.speed_icon, UnitConverterFragment())),
-            HomeItem.Card(CardItem("Energy", R.drawable.energy_icon, UnitConverterFragment())),
+            HomeItem.Header(getString(R.string.header_mechanical)),
+            HomeItem.Card(CardItem(getString(R.string.power), R.drawable.power_icon, newUnitConverterFragment())),
+            HomeItem.Card(CardItem(getString(R.string.torque), R.drawable.torque_icon, newUnitConverterFragment())),
+            HomeItem.Card(CardItem(getString(R.string.pressure), R.drawable.pressure_icon, newUnitConverterFragment())),
+            HomeItem.Card(CardItem(getString(R.string.energy), R.drawable.energy_icon, newUnitConverterFragment())),
+            HomeItem.Card(CardItem(getString(R.string.angle), R.drawable.angle_icon, newUnitConverterFragment())),
 
-            HomeItem.Header("Mechanical Units"),
-            HomeItem.Card(CardItem("Power", R.drawable.power_icon, UnitConverterFragment())),
-            HomeItem.Card(CardItem("Torque", R.drawable.torque_icon, UnitConverterFragment())),
-            HomeItem.Card(CardItem("Pressure", R.drawable.pressure_icon, UnitConverterFragment())),
-            HomeItem.Card(CardItem("Force", R.drawable.energy_icon, UnitConverterFragment())),
-            HomeItem.Card(CardItem("Angle", R.drawable.angle_icon, UnitConverterFragment())),
+            HomeItem.Header(getString(R.string.header_finance)),
+            HomeItem.Card(CardItem(getString(R.string.ratio), R.drawable.ratio_icon, newUnitConverterFragment())),
+            HomeItem.Card(CardItem(getString(R.string.currency), R.drawable.currency_icon, newUnitConverterFragment())),
+            HomeItem.Card(CardItem(getString(R.string.percentage), R.drawable.percentage_icon, newUnitConverterFragment())),
 
-            HomeItem.Header("Finance"),
-            HomeItem.Card(CardItem("Ratio", R.drawable.ratio_icon, UnitConverterFragment())),
-            HomeItem.Card(CardItem("Currency", R.drawable.currency_icon, UnitConverterFragment())),
-            HomeItem.Card(
-                CardItem(
-                    "Percentage",
-                    R.drawable.percentage_icon,
-                    UnitConverterFragment()
-                )
-            ),
-
-            HomeItem.Header("Special"),
-            HomeItem.Card(CardItem("Sound", R.drawable.sound_icon, UnitConverterFragment())),
-            HomeItem.Card(CardItem("BMI", R.drawable.bmi_icon, UnitConverterFragment()))
+            HomeItem.Header(getString(R.string.header_special)),
+            HomeItem.Card(CardItem(getString(R.string.sound), R.drawable.sound_icon, newUnitConverterFragment())),
+            HomeItem.Card(CardItem(getString(R.string.bmi), R.drawable.bmi_icon, newUnitConverterFragment()))
         )
 
         val adapter = HomeAdapter(items, parentFragmentManager)
@@ -79,12 +64,11 @@ class Home : Fragment() {
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
                 val item = adapter.items[position]
-                return if (item is HomeItem.Header) 3 else 1            }
+                return if (item is HomeItem.Header) 3 else 1
+            }
         }
 
         recycler.layoutManager = layoutManager
-
-
         recycler.adapter = adapter
 
         val searchView = view.findViewById<EditText>(R.id.searchView_home)
@@ -93,7 +77,6 @@ class Home : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 adapter.filter(s.toString())
             }
-
             override fun afterTextChanged(s: android.text.Editable?) {}
         })
 

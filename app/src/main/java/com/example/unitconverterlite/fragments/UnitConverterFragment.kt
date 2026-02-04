@@ -46,35 +46,20 @@ class UnitConverterFragment : Fragment() {
     private lateinit var equalButton: MaterialButton
     private lateinit var keyboard: GridLayout
     private lateinit var switchButton: ImageView
+    private var fromUnit: String = ""
+    private var toUnit: String = ""
     private lateinit var viewpager: ViewPager2
-    private lateinit var value_one_spinner: Spinner
-    private lateinit var value_two_spinner: Spinner
+    private lateinit var value_one_spinner: TextView
+    private lateinit var value_two_spinner: TextView
     internal lateinit var copyButton: MaterialButton
     var rotated = false
     private lateinit var historyViewModel: HistoryViewModel
+
     private val ratioViewModel: RatioViewModel by activityViewModels()
     private val bmiViewModel: BMIViewModel by activityViewModels()
     private val unitConverterViewModel: UnitConverterViewModel by activityViewModels()
 
-
-    private val unitsMap = mapOf(
-        "Length" to listOf("Meters", "Kilometers", "Miles", "Feet", "Inches"),
-        "Area" to listOf("Square Meter", "Square Kilometer", "Square Mile", "Hectare", "Acre"),
-        "Time" to listOf("Seconds", "Minutes", "Hours", "Days", "Weeks"),
-        "Volume" to listOf("Liter", "Milliliter", "Gallon", "Cubic Meter", "Cubic Feet"),
-        "Temperature" to listOf("Celsius", "Fahrenheit", "Kelvin"),
-        "Weight" to listOf("Kilograms", "Grams", "Pounds", "Ounces"),
-        "Speed" to listOf("meters per second", "kilometers per hour", "miles per hour", "feet per second"),
-        "Energy" to listOf("Joule", "Calorie", "kWh", "BTU"),
-        "Power" to listOf("Watt", "Kilowatt", "Horsepower"),
-        "Torque" to listOf("Newton meter", "Kilogram meter", "Pound-foot"),
-        "Pressure" to listOf("Pascal", "Kilopascal", "Bar", "Pounds per square inch"),
-        "Force" to listOf("Newton", "Kilogram-force", "Pound-force"),
-        "Angle" to listOf("Degree", "Radian", "Gradian"),
-        "Currency" to listOf("USD", "EUR", "GBP", "JPY", "PKR"),
-        "Sound" to listOf("Hertz","Kilohertz", "Megahertz", "Pascal", "Micropascal", "Decibel", "Watt per square meter"),
-        "BMI" to listOf("Metric", "Imperial")
-    )
+    private lateinit var unitsMap: Map<String, List<String>>
 
     override fun onResume() {
         super.onResume()
@@ -91,6 +76,26 @@ class UnitConverterFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val view = inflater.inflate(R.layout.fragment_unit_converter, container, false)
+
+        unitsMap = mapOf(
+            getString(R.string.length) to listOf(getString(R.string.meter), getString(R.string.kilometer), getString(R.string.mile), getString(R.string.feet), getString(R.string.inch)),
+            getString(R.string.area) to listOf(getString(R.string.square_meter), getString(R.string.square_kilometer), getString(R.string.square_mile), getString(R.string.hectare), getString(R.string.acre)),
+            getString(R.string.time) to listOf(getString(R.string.second), getString(R.string.minute), getString(R.string.hour), getString(R.string.day), getString(R.string.week)),
+            getString(R.string.volume) to listOf(getString(R.string.liter), getString(R.string.milliliter), getString(R.string.gallon), getString(R.string.cubic_meter), getString(R.string.cubic_foot)),
+            getString(R.string.temperature) to listOf(getString(R.string.celsius), getString(R.string.fahrenheit), getString(R.string.kelvin)),
+            getString(R.string.weight) to listOf(getString(R.string.kilogram), getString(R.string.gram), getString(R.string.pound), getString(R.string.ounce)),
+            getString(R.string.speed) to listOf(getString(R.string.mps), getString(R.string.kmph), getString(R.string.mph), getString(R.string.fps)),
+            getString(R.string.energy) to listOf(getString(R.string.joule), getString(R.string.calorie), getString(R.string.kwh), getString(R.string.btu)),
+            getString(R.string.power) to listOf(getString(R.string.watt), getString(R.string.kilowatt), getString(R.string.horsepower)),
+            getString(R.string.torque) to listOf(getString(R.string.newton_meter), getString(R.string.kilogram_meter), getString(R.string.pound_foot)),
+            getString(R.string.pressure) to listOf(getString(R.string.pascal), getString(R.string.kilopascal), getString(R.string.bar), getString(R.string.psi)),
+            getString(R.string.force) to listOf(getString(R.string.newton), getString(R.string.kilogram_force), getString(R.string.pound_force)),
+            getString(R.string.angle) to listOf(getString(R.string.degree), getString(R.string.radian), getString(R.string.gradian)),
+            getString(R.string.currency) to listOf(getString(R.string.usd), getString(R.string.eur), getString(R.string.gbp), getString(R.string.jpy), getString(R.string.pkr)),
+            getString(R.string.sound) to listOf(getString(R.string.hertz), getString(R.string.kilohertz), getString(R.string.megahertz), getString(R.string.pascal_unit), getString(R.string.micropascal), getString(R.string.decibel), getString(R.string.watt_per_square_meter)),
+            getString(R.string.bmi) to listOf(getString(R.string.metric), getString(R.string.imperial))
+        )
+
         setupKeyboard(view)
         return view
     }
@@ -101,7 +106,7 @@ class UnitConverterFragment : Fragment() {
         // Toolbar setup
         val toolbar = view.findViewById<MaterialToolbar>(R.id.unitConverter_appBar)
         val cardTitle = arguments?.getString("title") ?: "Unit Converter"
-        val cardType = arguments?.getString("type") ?: "Length"
+        val cardType = arguments?.getString("type") ?: getString(R.string.length)
         copyButton = view.findViewById<MaterialButton>(R.id.copy_result_btn)
 
         toolbar.title = cardTitle
@@ -117,8 +122,8 @@ class UnitConverterFragment : Fragment() {
         val ratioUI = view.findViewById<ConstraintLayout>(R.id.ratio_UI)
         val bmiUI = view.findViewById<ConstraintLayout>(R.id.bmi_UI)
         switchButton = view.findViewById<ImageView>(R.id.switching_unit_icon)
-        value_one_spinner = view.findViewById<Spinner>(R.id.value_one_spinner)
-        value_two_spinner = view.findViewById<Spinner>(R.id.value_two_spinner)
+        value_one_spinner = view.findViewById<TextView>(R.id.value_one_spinner)
+        value_two_spinner = view.findViewById<TextView>(R.id.value_two_spinner)
         valueOne = view.findViewById<EditText>(R.id.value_one)
         valueTwo = view.findViewById<EditText>(R.id.value_two)
         viewpager = view.findViewById<ViewPager2>(R.id.percentage_view_pager)
@@ -134,17 +139,17 @@ class UnitConverterFragment : Fragment() {
         }
 
         when (cardType) {
-            "Percentage" -> {
+            getString(R.string.percentage) -> {
                 layoutPercentage.visibility = View.VISIBLE
                 setupPercentageUI(view)
             }
 
-            "Ratio" -> {
+            getString(R.string.ratio) -> {
                 ratioUI.visibility = View.VISIBLE
                 setupRatioUI(view)
             }
 
-            "BMI" -> {
+            getString(R.string.bmi) -> {
                 bmiUI.visibility = View.VISIBLE
                 setupBMIUI(view)
             }
@@ -182,26 +187,21 @@ class UnitConverterFragment : Fragment() {
 
 
     private fun setupRegularUI(view: View, cardType: String) {
-        val spinnerOne = view.findViewById<Spinner>(R.id.value_one_spinner)
-        val spinnerTwo = view.findViewById<Spinner>(R.id.value_two_spinner)
-
         val units = unitsMap[cardType] ?: listOf("Unit1", "Unit2")
-        val adapter1 = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, units)
-        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        val adapter2 = ArrayAdapter(requireContext(), R.layout.spinner_dropdown_item, units)
-        adapter2.setDropDownViewResource(R.layout.spinner_dropdown_item)
-        spinnerOne.adapter = adapter1
-        spinnerTwo.adapter = adapter2
-        spinnerOne.setSelection(0)
-        spinnerTwo.setSelection(1)
-        spinnerOne.post {
-            spinnerOne.dropDownWidth = spinnerOne.width
+
+        fromUnit = units[0]
+        toUnit = units[1]
+
+        value_one_spinner.text = fromUnit
+        value_two_spinner.text = toUnit
+
+        value_one_spinner.setOnClickListener {
+            showDropdown(value_one_spinner, units)
         }
 
-        spinnerTwo.post {
-            spinnerTwo.dropDownWidth = spinnerTwo.width
+        value_two_spinner.setOnClickListener {
+            showDropdown(value_two_spinner, units)
         }
-
         valueOne = view.findViewById(R.id.value_one)
         valueTwo = view.findViewById(R.id.value_two)
 
@@ -226,64 +226,31 @@ class UnitConverterFragment : Fragment() {
 
         val appPrefs = AppPreferences(requireContext())
         lifecycleScope.launch {
-            val decimalPrecision = appPrefs.decimalPrecisionFlow.first() // get current saved value
+            val decimalPrecision = appPrefs.decimalPrecisionFlow.first()
 
             valueOne.addTextChangedListener(SimpleWatcher {
-                val fromUnit = spinnerOne.selectedItem.toString()
-                val toUnit = spinnerTwo.selectedItem.toString()
+                fromUnit
+                toUnit
                 val type = arguments?.getString("type") ?: "Length"
                 unitConverterViewModel.onValueOneChanged(
                     valueOne.text.toString(),
                     fromUnit,
                     toUnit,
                     type,
-                    decimalPrecision
+                    decimalPrecision,
+                    requireContext()
                 )
             })
 
-            spinnerOne.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    val fromUnit = spinnerOne.selectedItem.toString()
-                    val toUnit = spinnerTwo.selectedItem.toString()
-                    val type = arguments?.getString("type") ?: "Length"
-                    unitConverterViewModel.onValueOneChanged(
-                        valueOne.text.toString(),
-                        fromUnit,
-                        toUnit,
-                        type,
-                        decimalPrecision
-                    )
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            value_one_spinner.setOnClickListener {
+                showDropdown(value_one_spinner, units)
             }
 
-            spinnerTwo.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    val fromUnit = spinnerOne.selectedItem.toString()
-                    val toUnit = spinnerTwo.selectedItem.toString()
-                    val type = arguments?.getString("type") ?: "Length"
-                    unitConverterViewModel.onValueOneChanged(
-                        valueOne.text.toString(),
-                        fromUnit,
-                        toUnit,
-                        type,
-                        decimalPrecision
-                    )
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            value_two_spinner.setOnClickListener {
+                showDropdown(value_two_spinner, units)
             }
+
+
         }
 
     }
@@ -298,9 +265,9 @@ class UnitConverterFragment : Fragment() {
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {
-                0 -> "% Of"
-                1 -> "Add"
-                2 -> "Subtract"
+                0 -> getString(R.string.of)
+                1 -> getString(R.string.add)
+                2 -> getString(R.string.subtract)
                 else -> ""
             }
         }.attach()
@@ -593,22 +560,45 @@ class UnitConverterFragment : Fragment() {
 
     private fun switchButton() {
         switchButton.setOnClickListener {
+
             val animator = ObjectAnimator.ofFloat(switchButton, "rotation", 0f, 180f)
             animator.duration = 300
             animator.start()
+
             val tempValue = valueOne.text.toString()
             val tempValueTwo = valueTwo.text.toString()
-
-            val tempSpinnerPosition = value_one_spinner.selectedItemPosition
-            val tempSpinnerPositionTwo = value_two_spinner.selectedItemPosition
 
             valueOne.setText(tempValueTwo)
             valueTwo.setText(tempValue)
 
-            value_one_spinner.setSelection(tempSpinnerPositionTwo)
-            value_two_spinner.setSelection(tempSpinnerPosition)
+            val tempUnit = fromUnit
+            fromUnit = toUnit
+            toUnit = tempUnit
+
+            value_one_spinner.text = fromUnit
+            value_two_spinner.text = toUnit
+
+
+            lifecycleScope.launch {
+                val decimalPrecision =
+                    AppPreferences(requireContext()).decimalPrecisionFlow.first()
+
+                fromUnit
+                toUnit
+                val type = arguments?.getString("type") ?: "Length"
+
+                unitConverterViewModel.onValueOneChanged(
+                    valueOne.text.toString(),
+                    fromUnit,
+                    toUnit,
+                    type,
+                    decimalPrecision,
+                    requireContext()
+                )
+            }
         }
     }
+
 
 
     internal fun addHistory(
@@ -636,7 +626,7 @@ class UnitConverterFragment : Fragment() {
         val type = arguments?.getString("type") ?: "Length"
 
         when (type) {
-            "BMI" -> {
+            getString(R.string.bmi)-> {
                 val feet = view?.findViewById<EditText>(R.id.feet_value)?.text.toString()
                 val inches = view?.findViewById<EditText>(R.id.inches_value)?.text.toString()
                 val weight_kg = view?.findViewById<TextView>(R.id.kg_tv)?.text.toString()
@@ -649,13 +639,13 @@ class UnitConverterFragment : Fragment() {
                         valueGivenUnit = weight_kg,
                         valueReceived = result,
                         valueReceivedUnit = "",
-                        unitName = "BMI"
+                        unitName = getString(R.string.bmi)
                     )
                 }
             }
 
 
-            "Ratio" -> {
+            getString(R.string.ratio) -> {
                 val x = view?.findViewById<EditText>(R.id.x_value)?.text.toString()
                 val y = view?.findViewById<EditText>(R.id.y_value)?.text.toString()
                 val result = view?.findViewById<EditText>(R.id.result_value)?.text.toString()
@@ -665,13 +655,13 @@ class UnitConverterFragment : Fragment() {
                         valueGiven = x,
                         valueGivenUnit = y,
                         valueReceived = result,
-                        valueReceivedUnit = "Ratio",
-                        unitName = "Ratio"
+                        valueReceivedUnit = getString(R.string.ratio),
+                        unitName = getString(R.string.ratio)
                     )
                 }
             }
 
-            "Percentage" -> {
+            getString(R.string.percentage) -> {
 
                 val currentFragment = (viewpager.adapter as? PercentagePagerAdapter)
                     ?.getFragmentAt(viewpager.currentItem)
@@ -690,10 +680,10 @@ class UnitConverterFragment : Fragment() {
                 }
                 if (valueGiven.isNotEmpty() && valueReceived.isNotEmpty()) {
                     val unitName = when (viewpager.currentItem) {
-                        0 -> "Percentage"
-                        1 -> "Percentage"
-                        2 -> "Percentage"
-                        else -> "Percentage"
+                        0 -> getString(R.string.percentage)
+                        1 ->getString(R.string.percentage)
+                        2 -> getString(R.string.percentage)
+                        else -> getString(R.string.percentage)
                     }
 
                     addHistory(
@@ -711,8 +701,8 @@ class UnitConverterFragment : Fragment() {
             else -> {
                 val valueGiven = valueOne.text.toString()
                 val valueReceived = valueTwo.text.toString()
-                val fromUnit = value_one_spinner.selectedItem?.toString() ?: ""
-                val toUnit = value_two_spinner.selectedItem?.toString() ?: ""
+                fromUnit
+                toUnit
 
                 if (valueGiven.isNotEmpty() && valueReceived.isNotEmpty()) {
                     addHistory(
@@ -735,6 +725,61 @@ class UnitConverterFragment : Fragment() {
             clipboard.setPrimaryClip(clip)
             Toast.makeText(requireContext(), "Copied: $resultText", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun showDropdown(anchor: View, items: List<String>) {
+        val popupWindow = PopupWindow(anchor.context)
+
+        val adapter = ArrayAdapter(anchor.context, R.layout.popup_item, items)
+
+        val listView = ListView(anchor.context).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            divider = null
+            setAdapter(adapter)
+        }
+
+        popupWindow.setBackgroundDrawable(
+            ContextCompat.getDrawable(anchor.context, R.drawable.spinner_dropdown_bg)
+        )
+
+        popupWindow.contentView = listView
+        popupWindow.width = anchor.width
+        popupWindow.height = LinearLayout.LayoutParams.WRAP_CONTENT
+        popupWindow.isFocusable = true
+        popupWindow.elevation = 10f
+
+        popupWindow.showAsDropDown(anchor)
+
+        listView.setOnItemClickListener { parent, view, position, id ->
+            val selected = items[position]
+            (anchor as TextView).text = selected
+
+            if (anchor.id == R.id.value_one_spinner) {
+                fromUnit = selected
+            } else {
+                toUnit = selected
+            }
+            popupWindow.dismiss()
+
+           val fromUnit = value_one_spinner.text.toString()
+            val toUnit = value_two_spinner.text.toString()
+            val type = arguments?.getString("type") ?: "Length"
+            lifecycleScope.launch {
+                val decimalPrecision = AppPreferences(requireContext()).decimalPrecisionFlow.first()
+                unitConverterViewModel.onValueOneChanged(
+                    valueOne.text.toString(),
+                    fromUnit,
+                    toUnit,
+                    type,
+                    decimalPrecision,
+                    requireContext()
+                )
+            }
+        }
+
     }
 
 

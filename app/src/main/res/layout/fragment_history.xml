@@ -6,7 +6,8 @@
     android:background="@color/white"
     android:paddingHorizontal="16dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".fragments.HistoryFragment">
+    tools:context=".fragments.HistoryFragment"
+    android:layoutDirection="locale">
 
 
  <com.google.android.material.appbar.AppBarLayout
@@ -18,10 +19,20 @@
       android:layout_width="match_parent"
       android:layout_height="?attr/actionBarSize"
       android:background="@color/white"
-      app:title="History"
+      app:title="@string/history_title"
       app:titleTextAppearance="@style/ToolbarTitle"
       app:navigationIcon="@drawable/back_arrow"/>
  </com.google.android.material.appbar.AppBarLayout>
+
+
+ <TextView
+     android:id="@+id/no_history_tv"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:text="@string/no_history"
+     android:layout_gravity="center"
+     android:textSize="20sp"
+     android:textColor="@color/dark_gray"/>
 
  <androidx.recyclerview.widget.RecyclerView
      android:id="@+id/history_rv"

@@ -36,7 +36,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:background="@null"
+            android:background="@drawable/searchbar_border"
+            android:padding="4dp"
+            android:layout_marginEnd="4dp"
             android:fontFamily="@font/nunito_regular"
             android:gravity="center_horizontal"
             android:inputType="numberDecimal"
@@ -47,15 +49,21 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <Spinner
+        <TextView
             android:id="@+id/value_one_spinner"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="@id/value_one"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:popupBackground="@drawable/spinner_dropdown_bg"
+            android:background="@color/white"
+            android:fontFamily="@font/nunito_regular"
+            android:gravity="center_vertical"
+            android:drawableRight="@drawable/arrow_down_icon"
+            android:padding="8dp"
+            android:text="Select Unit"
+            android:textColor="@color/black"
             app:layout_constraintStart_toEndOf="@id/value_one"
-            app:layout_constraintTop_toTopOf="@id/value_one" />
+            app:layout_constraintBottom_toBottomOf="@+id/value_one"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/value_one" />
 
         <ImageView
             android:id="@+id/switching_unit_icon"
@@ -73,7 +81,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:background="@null"
+            android:background="@drawable/searchbar_border"
+            android:padding="4dp"
+            android:layout_marginEnd="4dp"
             android:fontFamily="@font/nunito_regular"
             android:gravity="center_horizontal"
             android:inputType="numberDecimal"
@@ -84,15 +94,23 @@
             app:layout_constraintStart_toStartOf="@id/value_one"
             app:layout_constraintTop_toBottomOf="@id/switching_unit_icon" />
 
-        <Spinner
+
+        <TextView
             android:id="@+id/value_two_spinner"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/nunito_regular"
+            android:gravity="center_vertical"
+            android:drawableRight="@drawable/arrow_down_icon"
+            android:padding="8dp"
+            android:text="Select Unit"
+            android:textColor="@color/app_color"
             app:layout_constraintBottom_toBottomOf="@id/value_two"
             app:layout_constraintEnd_toEndOf="parent"
-            android:popupBackground="@drawable/spinner_dropdown_bg"
+            android:popupBackground="@color/white"
             app:layout_constraintStart_toEndOf="@id/value_two"
-            app:layout_constraintTop_toTopOf="@id/value_two" />
+            app:layout_constraintTop_toTopOf="@id/value_two"/>
+
 
 
 
@@ -202,7 +220,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:fontFamily="@font/nunito_semi_bold"
-            android:text="Result"
+            android:text="@string/result"
             android:textColor="@color/light_gray"
             android:textSize="18sp"
             app:layout_constraintStart_toStartOf="@id/y_value"
@@ -276,7 +294,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:fontFamily="@font/nunito_regular"
-            android:text="inches"
+            android:text="@string/inch"
             android:textColor="@color/light_gray"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="@id/feet_tv"
@@ -307,7 +325,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:fontFamily="@font/nunito_regular"
-            android:text="Weight"
+            android:text="@string/weight"
             android:textColor="@color/light_gray"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="@id/feet_value"
@@ -361,7 +379,7 @@
             android:id="@+id/result_tv_bmi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Result:"
+            android:text="@string/result"
             android:fontFamily="@font/nunito_regular"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="@id/weight_container"
@@ -418,12 +436,12 @@
             android:paddingBottom="8dp"
             android:padding="8dp"
             android:background="@color/contrast"
+            android:layoutDirection="ltr"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHeight_percent="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
-\
 
 
 

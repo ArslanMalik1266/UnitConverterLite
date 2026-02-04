@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.unitconverterlite.Adaptor.HistoryAdaptor
@@ -20,6 +21,7 @@ class HistoryFragment : Fragment() {
     private lateinit var historyViewModel: HistoryViewModel
     private lateinit var historyAdapter: HistoryAdaptor
     private lateinit var recyclerView: RecyclerView
+    private lateinit var noHistoryTv : TextView
 
     override fun onResume() {
         super.onResume()
@@ -36,6 +38,8 @@ class HistoryFragment : Fragment() {
         historyAdapter = HistoryAdaptor(emptyList())
         recyclerView.adapter = historyAdapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        noHistoryTv = view.findViewById(R.id.no_history_tv)
+
 
         historyViewModel = ViewModelProvider(
             this,
@@ -44,6 +48,13 @@ class HistoryFragment : Fragment() {
 
         historyViewModel.history.observe(viewLifecycleOwner) { list: List<HistoryItem> ->
             historyAdapter.submitList(list)
+            if (list.isEmpty()) {
+                noHistoryTv.visibility = View.VISIBLE
+                recyclerView.visibility = View.GONE
+            } else {
+                noHistoryTv.visibility = View.GONE
+                recyclerView.visibility = View.VISIBLE
+            }
         }
 
         return view

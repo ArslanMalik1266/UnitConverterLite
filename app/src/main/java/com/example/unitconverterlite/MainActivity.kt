@@ -1,30 +1,33 @@
 package com.example.unitconverterlite
 
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.lifecycleScope
 import com.example.unitconverterlite.fragments.HistoryFragment
 import com.example.unitconverterlite.fragments.Home
 import com.example.unitconverterlite.fragments.SettingsFragment
-import com.example.unitconverterlite.utils.ThemePreferences
-import com.google.android.material.bottomnavigation.BottomNavigationItemView
-import com.google.android.material.bottomnavigation.BottomNavigationMenuView
+import com.example.unitconverterlite.utils.LanguagePreferences
+import com.example.unitconverterlite.utils.LocaleHelper
+
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 
 class MainActivity : AppCompatActivity() {
     private lateinit var bottomNavigationView : BottomNavigationView
+
+    override fun attachBaseContext(newBase: Context) {
+        val lang = runBlocking { LanguagePreferences(newBase).languageFlow.first() }
+        val context = LocaleHelper.setLocale(newBase, lang)
+        super.attachBaseContext(context)
+    }
 
 
     @RequiresApi(Build.VERSION_CODES.R)
