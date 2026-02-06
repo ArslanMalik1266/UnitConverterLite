@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/main"
     android:background="@color/white"
     tools:context=".fragments.UnitConverterFragment">
 
@@ -28,7 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="24dp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <EditText
@@ -42,8 +43,8 @@
             android:fontFamily="@font/nunito_regular"
             android:gravity="center_horizontal"
             android:inputType="numberDecimal"
-            android:text="0"
-            android:textColor="@color/black"
+            android:text=""
+            android:textColor="@color/value_one_text_color"
             android:textSize="18sp"
             app:layout_constraintEnd_toStartOf="@id/value_one_spinner"
             app:layout_constraintStart_toStartOf="parent"
@@ -81,7 +82,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:background="@drawable/values_border"
+            android:background="@drawable/second_value_border"
             android:padding="4dp"
             android:layout_marginEnd="4dp"
             android:fontFamily="@font/nunito_regular"

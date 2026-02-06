@@ -43,102 +43,101 @@
     <string name="bmi">BMI</string>
 
     <!-- Length Units -->
-    <string name="meter">Meter</string>
-    <string name="kilometer">Kilometer</string>
-    <string name="mile">Mile</string>
-    <string name="foot">Foot</string>
-    <string name="feet">Feet</string>
-    <string name="inch">Inch</string>
+    <string name="meter">Meter (m)</string>
+    <string name="kilometer">Kilometer (km)</string>
+    <string name="mile">Mile (mi)</string>
+    <string name="foot">Foot (ft)</string>
+    <string name="feet">Feet (ft)</string>
+    <string name="inch">Inch (in)</string>
 
     <!-- Area Units -->
-    <string name="square_meter">Square Meter</string>
-    <string name="square_kilometer">Square Kilometer</string>
-    <string name="square_mile">Square Mile</string>
-    <string name="hectare">Hectare</string>
-    <string name="acre">Acre</string>
+    <string name="square_meter">Square Meter (m²)</string>
+    <string name="square_kilometer">Square Kilometer (km²)</string>
+    <string name="square_mile">Square Mile (mi²)</string>
+    <string name="hectare">Hectare (ha)</string>
+    <string name="acre">Acre (ac)</string>
 
     <!-- Volume Units -->
-    <string name="liter">Liter</string>
-    <string name="milliliter">Milliliter</string>
-    <string name="gallon">Gallon</string>
-    <string name="cubic_meter">Cubic Meter</string>
-    <string name="cubic_foot">Cubic Feet</string>
+    <string name="liter">Liter (L)</string>
+    <string name="milliliter">Milliliter (mL)</string>
+    <string name="gallon">Gallon (gal)</string>
+    <string name="cubic_meter">Cubic Meter (m³)</string>
+    <string name="cubic_foot">Cubic Feet (ft³)</string>
 
     <!-- Weight Units -->
-    <string name="kilogram">Kilogram</string>
-    <string name="gram">Gram</string>
-    <string name="pound">Pound</string>
-    <string name="ounce">Ounce</string>
+    <string name="kilogram">Kilogram (kg)</string>
+    <string name="gram">Gram (g)</string>
+    <string name="pound">Pound (lb)</string>
+    <string name="ounce">Ounce (oz)</string>
 
     <!-- Temperature Units -->
-    <string name="celsius">Celsius</string>
-    <string name="fahrenheit">Fahrenheit</string>
-    <string name="kelvin">Kelvin</string>
+    <string name="celsius">Celsius (°C)</string>
+    <string name="fahrenheit">Fahrenheit (°F)</string>
+    <string name="kelvin">Kelvin (K)</string>
 
-    !-- Time Units -->
-    <string name="second">Second</string>
-    <string name="minute">Minute</string>
-    <string name="hour">Hour</string>
-    <string name="day">Day</string>
-    <string name="week">Week</string>
+    <!-- Time Units -->
+    <string name="second">Second (s)</string>
+    <string name="minute">Minute (min)</string>
+    <string name="hour">Hour (h)</string>
+    <string name="day">Day (d)</string>
+    <string name="week">Week (wk)</string>
 
     <!-- Speed Units -->
-    <string name="meters_per_second">meters per second</string>
-    <string name="kilometers_per_hour">kilometers per hour</string>
-    <string name="miles_per_hour">miles per hour</string>
-    <string name="feet_per_second">feet per second</string>
+    <string name="meters_per_second">Meters per second (m/s)</string>
+    <string name="kilometers_per_hour">Kilometers per hour (km/h)</string>
+    <string name="miles_per_hour">Miles per hour (mph)</string>
+    <string name="feet_per_second">Feet per second (ft/s)</string>
 
     <!-- Energy Units -->
-    <string name="joule">Joule</string>
-    <string name="calorie">Calorie</string>
-    <string name="kwh">kWh</string>
-    <string name="btu">BTU</string>
+    <string name="joule">Joule (J)</string>
+    <string name="calorie">Calorie (cal)</string>
+    <string name="kwh">kWh (kWh)</string>
+    <string name="btu">BTU (BTU)</string>
 
     <!-- Power Units -->
-    <string name="watt">Watt</string>
-    <string name="kilowatt">Kilowatt</string>
-    <string name="horsepower">Horsepower</string>
+    <string name="watt">Watt (W)</string>
+    <string name="kilowatt">Kilowatt (kW)</string>
+    <string name="horsepower">Horsepower (hp)</string>
 
     <!-- Torque Units -->
-    <string name="newton_meter">Newton meter</string>
-    <string name="kilogram_meter">Kilogram meter</string>
-    <string name="pound_foot">Pound-foot</string>
+    <string name="newton_meter">Newton meter (N·m)</string>
+    <string name="kilogram_meter">Kilogram meter (kg·m)</string>
+    <string name="pound_foot">Pound-foot (lb·ft)</string>
 
     <!-- Pressure Units -->
-    <string name="pascal">Pascal</string>
-    <string name="kilopascal">Kilopascal</string>
-    <string name="bar">Bar</string>
-    <string name="psi">Pounds per square inch</string>
+    <string name="pascal">Pascal (Pa)</string>
+    <string name="kilopascal">Kilopascal (kPa)</string>
+    <string name="bar">Bar (bar)</string>
+    <string name="psi">Pounds per square inch (psi)</string>
 
     <!-- Force Units -->
-    <string name="newton">Newton</string>
-    <string name="kilogram_force">Kilogram-force</string>
-    <string name="pound_force">Pound-force</string>
+    <string name="newton">Newton (N)</string>
+    <string name="kilogram_force">Kilogram-force (kgf)</string>
+    <string name="pound_force">Pound-force (lbf)</string>
 
     <!-- Angle Units -->
-    <string name="degree">Degree</string>
-    <string name="radian">Radian</string>
-    <string name="gradian">Gradian</string>
+    <string name="degree">Degree (°)</string>
+    <string name="radian">Radian (rad)</string>
+    <string name="gradian">Gradian (gon)</string>
 
-    <!-- Currency (Display names) -->
-    <string name="usd">USD</string>
-    <string name="eur">EUR</string>
-    <string name="gbp">GBP</string>
-    <string name="jpy">JPY</string>
-    <string name="pkr">PKR</string>
+    <string name="usd">USD (USD)</string>
+    <string name="eur">EUR (EUR)</string>
+    <string name="gbp">GBP (GBP)</string>
+    <string name="jpy">JPY (JPY)</string>
+    <string name="pkr">PKR (PKR)</string>
 
-    <!-- Sound Units -->
-    <string name="hertz">Hertz</string>
-    <string name="kilohertz">Kilohertz</string>
-    <string name="megahertz">Megahertz</string>
-    <string name="pascal_unit">Pascal</string>
-    <string name="micropascal">Micropascal</string>
-    <string name="decibel">Decibel</string>
-    <string name="watt_per_square_meter">Watt per square meter</string>
+    <string name="hertz">Hertz (Hz)</string>
+    <string name="kilohertz">Kilohertz (kHz)</string>
+    <string name="megahertz">Megahertz (MHz)</string>
+    <string name="pascal_unit">Pascal (Pa)</string>
+    <string name="micropascal">Micropascal (μPa)</string>
+    <string name="decibel">Decibel (dB)</string>
+    <string name="watt_per_square_meter">Watt per square meter (W/m²)</string>
 
-    <!-- BMI -->
-    <string name="metric">metric</string>
-    <string name="imperial">imperial</string>
+    <!-- BMI Units -->
+    <string name="metric">Metric (kg/m²)</string>
+    <string name="imperial">Imperial (lb/in²)</string>
+
 
     <string name="result">Result</string>
     <string name="of">% Of</string>

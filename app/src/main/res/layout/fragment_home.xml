@@ -17,6 +17,7 @@
         android:hint="@string/search_units_to_convert"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
+        android:singleLine="true"
         android:layout_marginHorizontal="8dp"
         android:fontFamily="@font/nunito_light"
         android:drawableStart="@drawable/search"

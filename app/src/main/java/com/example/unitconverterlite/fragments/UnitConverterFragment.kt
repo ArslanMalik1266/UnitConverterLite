@@ -64,6 +64,7 @@ class UnitConverterFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         (activity as? MainActivity)?.showBottomNav(false)
+
     }
 
     override fun onDestroyView() {
@@ -76,6 +77,23 @@ class UnitConverterFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val view = inflater.inflate(R.layout.fragment_unit_converter, container, false)
+
+        view.setOnTouchListener { _, event ->
+            val touchX = event.rawX
+            val touchY = event.rawY
+
+            val editTexts = listOf(valueOne, valueTwo)
+            val excludeViews = listOf(keyboard, value_one_spinner, value_two_spinner)
+
+            if (editTexts.any { it.isFocused } &&
+                excludeViews.none { isTouchInsideView(touchX, touchY, it) }
+            ) {
+                editTexts.forEach { it.clearFocus() }
+            }
+
+            false
+        }
+
 
         unitsMap = mapOf(
             getString(R.string.length) to listOf(getString(R.string.meter), getString(R.string.kilometer), getString(R.string.mile), getString(R.string.feet), getString(R.string.inch)),
@@ -789,6 +807,13 @@ class UnitConverterFragment : Fragment() {
         }
     }
 
+    private fun isTouchInsideView(touchX: Float, touchY: Float, view: View): Boolean {
+        val location = IntArray(2)
+        view.getLocationOnScreen(location)
+        val x = location[0]
+        val y = location[1]
+        return touchX >= x && touchX <= x + view.width && touchY >= y && touchY <= y + view.height
+    }
 
 
 }

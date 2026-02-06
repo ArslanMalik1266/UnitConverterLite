@@ -1,7 +1,6 @@
 package com.example.unitconverterlite.Adaptor
 
 import android.os.Bundle
-import android.provider.Settings.Global.putString
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,10 +13,11 @@ import com.example.unitconverterlite.R
 
 class HomeAdapter(
     internal var items: List<HomeItem>,
-    private val fragmentManager: FragmentManager
+    private val fragmentManager: FragmentManager,
+    private val onItemClick: () -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var fullList: List<HomeItem> = items.toList()
+    private val fullList: List<HomeItem> = items.toList()
 
     companion object {
         private const val TYPE_HEADER = 0
@@ -44,7 +44,6 @@ class HomeAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-
         when (val item = items[position]) {
 
             is HomeItem.Header -> {
@@ -69,6 +68,9 @@ class HomeAdapter(
                         .replace(R.id.main_container, cardItem.fragment)
                         .addToBackStack(null)
                         .commit()
+
+                    onItemClick()
+
                 }
             }
         }
@@ -86,34 +88,44 @@ class HomeAdapter(
     }
 
     fun filter(query: String) {
-        if (query.isEmpty()) {
+        if (query.isBlank()) {
             items = fullList
-        } else {
-            val filtered = mutableListOf<HomeItem>()
-            var currentHeader: HomeItem.Header? = null
-            var headerAdded = false
+            notifyDataSetChanged()
+            return
+        }
 
-            fullList.forEach { item ->
-                when (item) {
-                    is HomeItem.Header -> {
-                        currentHeader = item
-                        headerAdded = false
-                    }
-                    is HomeItem.Card -> {
-                        if (item.cardItem.title.contains(query, ignoreCase = true)) {
-                            if (currentHeader != null && !headerAdded) {
-                                filtered.add(currentHeader!!)
-                                headerAdded = true
-                            }
-                            filtered.add(item)
+        val filtered = mutableListOf<HomeItem>()
+        var currentHeader: HomeItem.Header? = null
+        var headerAdded = false
+
+        fullList.forEach { item ->
+            when (item) {
+                is HomeItem.Header -> {
+                    currentHeader = item
+                    headerAdded = false
+                }
+
+                is HomeItem.Card -> {
+                    val matchInTitle =
+                        item.cardItem.title.contains(query, ignoreCase = true)
+
+                    val matchInKeywords =
+                        item.cardItem.keywords.any {
+                            it.contains(query, ignoreCase = true)
                         }
+
+                    if (matchInTitle || matchInKeywords) {
+                        if (!headerAdded && currentHeader != null) {
+                            filtered.add(currentHeader!!)
+                            headerAdded = true
+                        }
+                        filtered.add(item)
                     }
                 }
             }
-
-            items = filtered
         }
 
+        items = filtered
         notifyDataSetChanged()
     }
 
