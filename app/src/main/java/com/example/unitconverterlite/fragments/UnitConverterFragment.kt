@@ -84,7 +84,7 @@ class UnitConverterFragment : Fragment() {
             getString(R.string.volume) to listOf(getString(R.string.liter), getString(R.string.milliliter), getString(R.string.gallon), getString(R.string.cubic_meter), getString(R.string.cubic_foot)),
             getString(R.string.temperature) to listOf(getString(R.string.celsius), getString(R.string.fahrenheit), getString(R.string.kelvin)),
             getString(R.string.weight) to listOf(getString(R.string.kilogram), getString(R.string.gram), getString(R.string.pound), getString(R.string.ounce)),
-            getString(R.string.speed) to listOf(getString(R.string.mps), getString(R.string.kmph), getString(R.string.mph), getString(R.string.fps)),
+            getString(R.string.speed) to listOf(getString(R.string.meters_per_second), getString(R.string.kilometers_per_hour), getString(R.string.miles_per_hour), getString(R.string.feet_per_second)),
             getString(R.string.energy) to listOf(getString(R.string.joule), getString(R.string.calorie), getString(R.string.kwh), getString(R.string.btu)),
             getString(R.string.power) to listOf(getString(R.string.watt), getString(R.string.kilowatt), getString(R.string.horsepower)),
             getString(R.string.torque) to listOf(getString(R.string.newton_meter), getString(R.string.kilogram_meter), getString(R.string.pound_foot)),
@@ -196,11 +196,13 @@ class UnitConverterFragment : Fragment() {
         value_two_spinner.text = toUnit
 
         value_one_spinner.setOnClickListener {
-            showDropdown(value_one_spinner, units)
+            val units = unitsMap[cardType] ?: listOf("Unit1", "Unit2")
+            showDropdown(value_one_spinner, units, textColor = ContextCompat.getColor(requireContext(), R.color.black))
         }
 
         value_two_spinner.setOnClickListener {
-            showDropdown(value_two_spinner, units)
+            val units = unitsMap[cardType] ?: listOf("Unit1", "Unit2")
+            showDropdown(value_two_spinner, units, textColor = ContextCompat.getColor(requireContext(), R.color.app_color))
         }
         valueOne = view.findViewById(R.id.value_one)
         valueTwo = view.findViewById(R.id.value_two)
@@ -211,7 +213,6 @@ class UnitConverterFragment : Fragment() {
         valueOne.requestFocus()
         activeEditText = valueOne
 
-        // Observe LiveData
         unitConverterViewModel.valueOne.observe(viewLifecycleOwner) { value ->
             if (valueOne.text.toString() != value) valueOne.setText(value)
         }
@@ -242,13 +243,6 @@ class UnitConverterFragment : Fragment() {
                 )
             })
 
-            value_one_spinner.setOnClickListener {
-                showDropdown(value_one_spinner, units)
-            }
-
-            value_two_spinner.setOnClickListener {
-                showDropdown(value_two_spinner, units)
-            }
 
 
         }
@@ -727,10 +721,23 @@ class UnitConverterFragment : Fragment() {
         }
     }
 
-    private fun showDropdown(anchor: View, items: List<String>) {
+    private fun showDropdown(anchor: View, items: List<String>, textColor: Int) {
         val popupWindow = PopupWindow(anchor.context)
 
-        val adapter = ArrayAdapter(anchor.context, R.layout.popup_item, items)
+        // Custom ArrayAdapter to set text color
+        val adapter = object : ArrayAdapter<String>(anchor.context, R.layout.popup_item, items) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getView(position, convertView, parent) as TextView
+                view.setTextColor(textColor)
+                return view
+            }
+
+            override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getDropDownView(position, convertView, parent) as TextView
+                view.setTextColor(textColor)
+                return view
+            }
+        }
 
         val listView = ListView(anchor.context).apply {
             layoutParams = LinearLayout.LayoutParams(
@@ -753,7 +760,7 @@ class UnitConverterFragment : Fragment() {
 
         popupWindow.showAsDropDown(anchor)
 
-        listView.setOnItemClickListener { parent, view, position, id ->
+        listView.setOnItemClickListener { _, _, position, _ ->
             val selected = items[position]
             (anchor as TextView).text = selected
 
@@ -762,9 +769,10 @@ class UnitConverterFragment : Fragment() {
             } else {
                 toUnit = selected
             }
+
             popupWindow.dismiss()
 
-           val fromUnit = value_one_spinner.text.toString()
+            val fromUnit = value_one_spinner.text.toString()
             val toUnit = value_two_spinner.text.toString()
             val type = arguments?.getString("type") ?: "Length"
             lifecycleScope.launch {
@@ -779,8 +787,8 @@ class UnitConverterFragment : Fragment() {
                 )
             }
         }
-
     }
+
 
 
 }

@@ -17,7 +17,6 @@ class UnitConverterViewModel : ViewModel() {
     private val _equalEnabled = MutableLiveData(false)
     val equalEnabled: LiveData<Boolean> = _equalEnabled
 
-    // Call this from Fragment and pass decimal precision
     fun onValueOneChanged(
         value: String,
         fromUnit: String,

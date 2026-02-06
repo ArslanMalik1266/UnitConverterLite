@@ -9,12 +9,15 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.example.unitconverterlite.utils.LanguagePreferences
+import com.example.unitconverterlite.utils.LocaleHelper
 import com.example.unitconverterlite.utils.ThemePreferences
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
 
 class SplashActivity : AppCompatActivity() {
+
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {

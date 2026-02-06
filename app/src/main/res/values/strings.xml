@@ -83,10 +83,10 @@
     <string name="week">Week</string>
 
     <!-- Speed Units -->
-    <string name="mps">meters per second</string>
-    <string name="kmph">kilometers per hour</string>
-    <string name="mph">miles per hour</string>
-    <string name="fps">feet per second</string>
+    <string name="meters_per_second">meters per second</string>
+    <string name="kilometers_per_hour">kilometers per hour</string>
+    <string name="miles_per_hour">miles per hour</string>
+    <string name="feet_per_second">feet per second</string>
 
     <!-- Energy Units -->
     <string name="joule">Joule</string>

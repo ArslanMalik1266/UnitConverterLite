@@ -29,7 +29,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="8dp"
             android:fontFamily="@font/nunito_medium"
-            android:textColor="@color/black"
+            android:textColor="@drawable/card_text_color"
             android:textSize="12sp"/>
     </LinearLayout>
 

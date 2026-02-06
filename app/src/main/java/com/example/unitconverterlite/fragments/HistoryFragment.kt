@@ -1,6 +1,7 @@
 package com.example.unitconverterlite.fragments
 
 import android.os.Bundle
+import android.text.TextUtils
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,7 @@ import com.example.unitconverterlite.R
 import com.example.unitconverterlite.viewModel.HistoryViewModel
 import com.google.android.material.appbar.MaterialToolbar
 import androidx.lifecycle.ViewModelProvider
+import androidx.core.text.layoutDirection
 
 class HistoryFragment : Fragment() {
 
@@ -39,6 +41,7 @@ class HistoryFragment : Fragment() {
         recyclerView.adapter = historyAdapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         noHistoryTv = view.findViewById(R.id.no_history_tv)
+
 
 
         historyViewModel = ViewModelProvider(
@@ -67,4 +70,5 @@ class HistoryFragment : Fragment() {
             requireActivity().onBackPressed()
         }
     }
+
 }

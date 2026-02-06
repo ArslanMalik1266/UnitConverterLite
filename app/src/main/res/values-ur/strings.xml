@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">یونٹ کنورٹر لائٹ</string>
+    <string name="history_title">پرانے ریکارڈز</string>
+    <string name="no_history">کوئی ریکارڈ نہیں ملا</string>
+    <string name="settings_title">ترتیبات</string>
+    <string name="dark_mode">ڈارک موڈ</string>
+    <string name="auto_save_history">ریکارڈ خود بخود محفوظ کریں</string>
+    <string name="decimal_precision">اعشاریہ کی درستگی</string>
+    <string name="no_decimals_e_g_42">کوئی اعشاریہ نہیں (مثال 42)</string>
+    <string name="_2_decimals_e_g_42_00">2 اعشاریہ (مثال 42.00)</string>
+    <string name="_4_decimals_e_g_42_0000">4 اعشاریہ (مثال 42.0000)</string>
+    <string name="about">کے بارے میں</string>
+    <string name="version">ورژن</string>
+    <string name="build">بلڈ</string>
+    <string name="latest_update">تازہ ترین اپ ڈیٹ</string>
+    <string name="search_units_to_convert">تبدیل کرنے کے لیے یونٹس تلاش کریں...</string>
+    <string name="miles">میل</string>
+    <string name="home">ہوم</string>
+
+    <!-- Headers -->
+    <string name="header_everyday">روزمرہ پیمائشیں</string>
+    <string name="header_mechanical">مشینی یونٹس</string>
+    <string name="header_finance">مالیات</string>
+    <string name="header_special">خصوصی</string>
+
+    <!-- Cards -->
+    <string name="length">لمبائی</string>
+    <string name="area">رقبہ</string>
+    <string name="time">وقت</string>
+    <string name="volume">حجم</string>
+    <string name="temperature">درجہ حرارت</string>
+    <string name="weight">وزن</string>
+    <string name="speed">رفتار</string>
+    <string name="energy">توانائی</string>
+    <string name="power">طاقت</string>
+    <string name="torque">گھومنے کی طاقت</string>
+    <string name="pressure">دباؤ</string>
+    <string name="force">قوت</string>
+    <string name="angle">زاویہ</string>
+    <string name="ratio">تناسب</string>
+    <string name="currency">کرنسی</string>
+    <string name="percentage">فیصد</string>
+    <string name="sound">صوت</string>
+    <string name="bmi">بی ایم آئی</string>
+
+    <!-- Length Units -->
+    <string name="meter">میٹر</string>
+    <string name="kilometer">کلومیٹر</string>
+    <string name="mile">میل</string>
+    <string name="foot">فٹ</string>
+    <string name="feet">فٹ</string>
+    <string name="inch">انچ</string>
+
+    <!-- Area Units -->
+    <string name="square_meter">مربع میٹر</string>
+    <string name="square_kilometer">مربع کلومیٹر</string>
+    <string name="square_mile">مربع میل</string>
+    <string name="hectare">ہیکٹر</string>
+    <string name="acre">ایکڑ</string>
+
+    <!-- Volume Units -->
+    <string name="liter">لیٹر</string>
+    <string name="milliliter">ملی لیٹر</string>
+    <string name="gallon">گیلن</string>
+    <string name="cubic_meter">مکعب میٹر</string>
+    <string name="cubic_foot">مکعب فٹ</string>
+
+    <!-- Weight Units -->
+    <string name="kilogram">کلوگرام</string>
+    <string name="gram">گرام</string>
+    <string name="pound">پاؤنڈ</string>
+    <string name="ounce">اونس</string>
+
+    <!-- Temperature Units -->
+    <string name="celsius">سیلسیس</string>
+    <string name="fahrenheit">فارن ہائیٹ</string>
+    <string name="kelvin">کیلون</string>
+
+    <!-- Time Units -->
+    <string name="second">سیکنڈ</string>
+    <string name="minute">منٹ</string>
+    <string name="hour">گھنٹہ</string>
+    <string name="day">دن</string>
+    <string name="week">ہفتہ</string>
+
+    <!-- Speed Units -->
+    <string name="meters_per_second">میٹر فی سیکنڈ</string>
+    <string name="kilometers_per_hour">کلومیٹر فی گھنٹہ</string>
+    <string name="miles_per_hour">میل فی گھنٹہ</string>
+    <string name="feet_per_second">فٹ فی سیکنڈ</string>
+
+    <!-- Energy Units -->
+    <string name="joule">جول</string>
+    <string name="calorie">کیلوری</string>
+    <string name="kwh">کلو واٹ گھنٹہ</string>
+    <string name="btu">بی ٹی یو</string>
+
+    <!-- Power Units -->
+    <string name="watt">واٹ</string>
+    <string name="kilowatt">کلو واٹ</string>
+    <string name="horsepower">ہارس پاور</string>
+
+    <!-- Torque Units -->
+    <string name="newton_meter">نیوٹن میٹر</string>
+    <string name="kilogram_meter">کلوگرام میٹر</string>
+    <string name="pound_foot">پاؤنڈ-فٹ</string>
+
+    <!-- Pressure Units -->
+    <string name="pascal">پاسکل</string>
+    <string name="kilopascal">کلو پاسکل</string>
+    <string name="bar">بار</string>
+    <string name="psi">پاؤنڈ فی مربع انچ</string>
+
+    <!-- Force Units -->
+    <string name="newton">نیوٹن</string>
+    <string name="kilogram_force">کلوگرام فورس</string>
+    <string name="pound_force">پاؤنڈ فورس</string>
+
+    <!-- Angle Units -->
+    <string name="degree">ڈگری</string>
+    <string name="radian">ریڈیئن</string>
+    <string name="gradian">گریڈیئن</string>
+
+    <!-- Currency (Display names) -->
+    <string name="usd">USD</string>
+    <string name="eur">EUR</string>
+    <string name="gbp">GBP</string>
+    <string name="jpy">JPY</string>
+    <string name="pkr">PKR</string>
+
+    <!-- Sound Units -->
+    <string name="hertz">ہرتز</string>
+    <string name="kilohertz">کلو ہرتز</string>
+    <string name="megahertz">میگاہرتز</string>
+    <string name="pascal_unit">پاسکل</string>
+    <string name="micropascal">مائیکرو پاسکل</string>
+    <string name="decibel">ڈیسیبل</string>
+    <string name="watt_per_square_meter">واٹ فی مربع میٹر</string>
+
+    <!-- BMI -->
+    <string name="metric">میٹرک</string>
+    <string name="imperial">امپیریل</string>
+
+    <string name="result">نتیجہ</string>
+    <string name="of">فیصد</string>
+    <string name="add">جمع کریں</string>
+    <string name="subtract">منفی کریں</string>
+    <string name="copied">نقل کیا گیا:</string>
+    <string name="english">انگریزی</string>
+    <string name="urdu">اردو</string>
+    <string name="language">زبان</string>
+    <string name="unit_converter_lite">یونٹ کنورٹر لائٹ</string>
+
+
+
+</resources>

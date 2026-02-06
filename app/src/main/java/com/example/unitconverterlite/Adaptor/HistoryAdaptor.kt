@@ -106,10 +106,10 @@ class HistoryAdaptor(
             "week" -> context.getString(R.string.week)
 
             // Speed units
-            "mps" -> context.getString(R.string.mps)
-            "kmph" -> context.getString(R.string.kmph)
-            "mph" -> context.getString(R.string.mph)
-            "fps" -> context.getString(R.string.fps)
+            "meters per second"-> context.getString(R.string.meters_per_second)
+            "kilometers per hour" -> context.getString(R.string.kilometers_per_hour)
+            "miles per second" -> context.getString(R.string.miles_per_hour)
+            "feet per hour" -> context.getString(R.string.feet_per_second)
 
             // Energy units
             "joule" -> context.getString(R.string.joule)
@@ -123,9 +123,9 @@ class HistoryAdaptor(
             "horsepower" -> context.getString(R.string.horsepower)
 
             // Torque units
-            "newton_meter" -> context.getString(R.string.newton_meter)
-            "kilogram_meter" -> context.getString(R.string.kilogram_meter)
-            "pound_foot" -> context.getString(R.string.pound_foot)
+            "newton meter" -> context.getString(R.string.newton_meter)
+            "kilogram meter" -> context.getString(R.string.kilogram_meter)
+            "pound foot" -> context.getString(R.string.pound_foot)
 
             // Pressure units
             "pascal" -> context.getString(R.string.pascal)

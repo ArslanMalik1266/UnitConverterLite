@@ -144,16 +144,16 @@ object UnitConverter {
     private fun convertSpeed(context: Context, value: Double, fromUnit: String, toUnit: String): Double {
         val mps = when (fromUnit) {
             context.getString(R.string.meter) -> value
-            context.getString(R.string.kmph) -> value / 3.6
-            context.getString(R.string.mph) -> value * 0.44704
-            context.getString(R.string.fps) -> value * 0.3048
+            context.getString(R.string.kilometers_per_hour) -> value / 3.6
+            context.getString(R.string.miles_per_hour) -> value * 0.44704
+            context.getString(R.string.feet_per_second) -> value * 0.3048
             else -> value
         }
         return when (toUnit) {
             context.getString(R.string.meter) -> mps
-            context.getString(R.string.kmph) -> mps * 3.6
-            context.getString(R.string.mph) -> mps / 0.44704
-            context.getString(R.string.fps) -> mps / 0.3048
+            context.getString(R.string.kilometers_per_hour) -> mps * 3.6
+            context.getString(R.string.miles_per_hour) -> mps / 0.44704
+            context.getString(R.string.feet_per_second) -> mps / 0.3048
             else -> mps
         }
     }
